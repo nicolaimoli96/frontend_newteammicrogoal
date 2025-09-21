@@ -172,7 +172,7 @@ const SetGoal: React.FC = () => {
       <form onSubmit={handleSaveGoals} className="modern-goal-form">
         <div className="goal-section modern-card">
           <div className="section-header">
-            <span className="section-icon" role="img" aria-label="Sales"><FaPoundSign /></span>
+            <span className="section-icon" role="img" aria-label="Sales">{FaPoundSign({})}</span>
             <div>
               <h2>Sales Target</h2>
               <p className="section-desc">Set your sales goal for the day (£).</p>
@@ -193,7 +193,7 @@ const SetGoal: React.FC = () => {
         </div>
         <div className="goal-section modern-card">
           <div className="section-header">
-            <span className="section-icon" role="img" aria-label="Reviews"><FaStar /></span>
+            <span className="section-icon" role="img" aria-label="Reviews">{FaStar({})}</span>
             <div>
               <h2>Reviews Target</h2>
               <p className="section-desc">How many Google reviews do you want to achieve?</p>
@@ -214,7 +214,7 @@ const SetGoal: React.FC = () => {
         </div>
         <div className="goal-section modern-card">
           <div className="section-header">
-            <span className="section-icon" role="img" aria-label="Micro Goal"><FaBolt /></span>
+            <span className="section-icon" role="img" aria-label="Micro Goal">{FaBolt({})}</span>
             <div>
               <h2>Micro Goal Target</h2>
               <p className="section-desc">Set a micro goal based on time and weather for a specific item.</p>
@@ -243,7 +243,7 @@ const SetGoal: React.FC = () => {
       <div className="modern-divider"><span>Site Comparison</span></div>
       <div className="input-group modern-card" style={{ marginTop: '2rem', maxWidth: 400 }}>
         <div className="section-header">
-          <span className="section-icon" role="img" aria-label="Sites"><FaCloudSun /></span>
+          <span className="section-icon" role="img" aria-label="Sites">{FaCloudSun({})}</span>
           <div>
             <label>Compare with these sites (up to 9):</label>
             <p className="section-desc">See how you stack up against other locations. Covent Garden is always included.</p>
