@@ -1,0 +1,297 @@
+.set-goal-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #23272f;
+  color: #fff;
+}
+.set-goal-container h1 {
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  font-weight: 700;
+}
+.set-goal-container form {
+  display: flex;
+  flex-direction: row;
+  gap: 1.5rem;
+  background: #181c24;
+  padding: 2rem 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  min-width: 900px;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+.goal-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: #23272f;
+  border-radius: 12px;
+  border: 1px solid #2e3646;
+  flex: 1;
+  min-width: 250px;
+}
+.goal-section h2 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #ff1493;
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.goal-section:nth-child(2) h2 {
+  color: #00ff88;
+}
+.goal-section:nth-child(3) h2 {
+  color: #ff8c00;
+}
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.input-group label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #b0b8c1;
+}
+.set-goal-container input,
+.set-goal-container select {
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  border: none;
+  font-size: 1.1rem;
+  background: #181c24;
+  color: #fff;
+  outline: none;
+  border: 1px solid #2e3646;
+}
+.set-goal-container input:focus,
+.set-goal-container select:focus {
+  border-color: #ff1493;
+  box-shadow: 0 0 0 2px rgba(255, 20, 147, 0.2);
+}
+.set-goal-container select {
+  cursor: pointer;
+}
+.set-goal-container select option {
+  background: #181c24;
+  color: #fff;
+}
+.save-button {
+  padding: 0.8rem 2rem;
+  border-radius: 8px;
+  border: none;
+  background: #ff1493;
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  min-width: 150px;
+}
+.save-button:hover {
+  background: #e91e63;
+}
+.site-checkbox-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  max-height: 260px;
+  overflow-y: auto;
+  background: #23272f;
+  border-radius: 8px;
+  padding: 0.5rem 0.5rem 0.5rem 0.2rem;
+  margin-top: 0.5rem;
+  box-shadow: 0 2px 8px #0002;
+}
+.site-checkbox-label {
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  color: #fff;
+  padding: 0.2rem 0.3rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+  position: relative;
+  user-select: none;
+}
+.site-checkbox-label.checked {
+  background: #2e3646;
+  font-weight: 600;
+}
+.site-checkbox-label.always-included {
+  color: #ffd700;
+  font-weight: 700;
+}
+.site-checkbox-label input[type="checkbox"] {
+  display: none;
+}
+.custom-checkbox {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #ff1493;
+  border-radius: 4px;
+  margin-right: 0.7rem;
+  background: #181c24;
+  display: inline-block;
+  position: relative;
+  transition: border-color 0.2s;
+}
+.site-checkbox-label.checked .custom-checkbox {
+  border-color: #00ff88;
+  background: #00ff8822;
+}
+.custom-checkbox:after {
+  content: '';
+  display: block;
+  width: 10px;
+  height: 10px;
+  margin: 2px auto;
+  border-radius: 2px;
+  background: transparent;
+  transition: background 0.2s;
+}
+.site-checkbox-label.checked .custom-checkbox:after {
+  background: #00ff88;
+}
+.micro-tabbed-select {
+  background: #23272f;
+  border-radius: 10px;
+  padding: 0.7rem 0.7rem 0.5rem 0.7rem;
+  margin-top: 0.2rem;
+  box-shadow: 0 2px 8px #0002;
+  max-width: 320px;
+}
+.micro-dropdown-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  background: none;
+  border: none;
+  box-shadow: none;
+}
+.micro-dropdown-trigger {
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.micro-dropdown-trigger.open, .micro-dropdown-trigger:focus {
+  border: 2px solid #ff1493;
+  box-shadow: 0 2px 8px #ff149355;
+}
+.micro-dropdown-input {
+  width: 100%;
+  padding: 0.6rem 1.2rem 0.6rem 1rem;
+  border-radius: 10px;
+  border: 2px solid #2e3646;
+  background: #181c24;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 500;
+  outline: none;
+  box-shadow: 0 1px 4px #0001;
+  transition: border 0.18s, box-shadow 0.18s;
+  appearance: none;
+}
+.micro-dropdown-input:focus {
+  border: 2px solid #ff1493;
+  box-shadow: 0 2px 8px #ff149355;
+}
+.micro-dropdown-arrow {
+  margin-left: -2.2rem;
+  font-size: 1.1em;
+  color: #ff1493;
+  pointer-events: none;
+  position: relative;
+  z-index: 2;
+}
+.micro-dropdown {
+  position: absolute;
+  left: 0;
+  top: 110%;
+  width: 100%;
+  background: #23272f;
+  border-radius: 12px;
+  box-shadow: 0 6px 32px #0005, 0 1.5px 8px #ff149322;
+  z-index: 10;
+  padding: 0.7rem 0.7rem 0.5rem 0.7rem;
+  margin-top: 0.2rem;
+  min-width: 180px;
+}
+.micro-tabs {
+  display: flex;
+  gap: 0.7rem;
+  margin-bottom: 0.7rem;
+  justify-content: flex-start;
+}
+.micro-tabs button {
+  background: #181c24;
+  color: #fff;
+  border: none;
+  border-radius: 20px 20px 20px 20px;
+  padding: 0.4rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  outline: none;
+  box-shadow: 0 1px 4px #0001;
+}
+.micro-tabs button.active {
+  background: #ff1493;
+  color: #fff;
+  box-shadow: 0 2px 8px #ff149355;
+}
+.micro-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  justify-content: flex-start;
+}
+.micro-option {
+  background: #181c24;
+  color: #fff;
+  border-radius: 8px;
+  padding: 0.45rem 1.1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: background 0.18s, color 0.18s, border 0.18s;
+  box-shadow: 0 1px 4px #0001;
+  user-select: none;
+  margin-bottom: 0.1rem;
+}
+.micro-option.selected {
+  background: #00ff88;
+  color: #181c24;
+  border: 2px solid #00ff88;
+  font-weight: 700;
+  box-shadow: 0 2px 8px #00ff8855;
+}
+.micro-dropdown-search {
+  width: 100%;
+  padding: 0.45rem 1rem;
+  margin-bottom: 0.7rem;
+  border-radius: 8px;
+  border: 1.5px solid #2e3646;
+  background: #181c24;
+  color: #fff;
+  font-size: 1rem;
+  outline: none;
+  box-shadow: 0 1px 4px #0001;
+  transition: border 0.18s;
+}
+.micro-dropdown-search:focus {
+  border: 1.5px solid #ff1493;
+} 

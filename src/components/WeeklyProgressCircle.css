@@ -1,0 +1,20 @@
+.weekly-progress-ring {
+  display: block;
+  margin: 0 auto;
+  background: none;
+}
+.weekly-progress {
+  /* No transition for weekly progress circles */
+}
+.weekly-progress.sales-progress {
+  filter: drop-shadow(0 0 4px #ff149366);
+}
+.weekly-progress.reviews-progress {
+  filter: drop-shadow(0 0 4px #00ff8866);
+}
+.weekly-progress.micro-progress {
+  filter: drop-shadow(0 0 4px #ff8c0066);
+}
+.tick-mark {
+  filter: drop-shadow(0 0 4px rgba(0,0,0,0.5)) drop-shadow(0 0 6px currentColor);
+} 
