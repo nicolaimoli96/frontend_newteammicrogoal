@@ -148,8 +148,10 @@ const SetGoal: React.FC = () => {
         // AI mode - get suggestions
         setAiPending(true);
         try {
-          const apiUrl = process.env.REACT_APP_API_URL || 'https://microgoals-ai-backend-new-1.onrender.com';
-          const res = await fetch(`${apiUrl}/api/suggest-category`, {
+          // Use Netlify function proxy to avoid CORS issues
+          const apiUrl = process.env.REACT_APP_API_URL || '';
+          const endpoint = apiUrl ? `${apiUrl}/api/suggest-category` : '/.netlify/functions/suggest-category';
+          const res = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

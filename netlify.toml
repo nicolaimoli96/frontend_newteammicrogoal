@@ -9,5 +9,8 @@
 
 [build.environment]
   NODE_VERSION = "20"
-  REACT_APP_API_URL = "https://microgoals-ai-backend-new-1.onrender.com"
+  # Using Netlify function proxy, so no need for direct backend URL
+
+[functions]
+  node_bundler = "esbuild"
 
