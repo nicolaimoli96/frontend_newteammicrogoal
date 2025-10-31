@@ -188,8 +188,8 @@ const SetGoal: React.FC = () => {
   // useEffect(() => {
   //   if (!microDropdownOpen) return;
   //   function handleClick(e: MouseEvent) {
-  //     if (microDropdownRef.current && !microDropdownRef.current.contains(e.target as Node)) {
-  //       setMicroDropdownOpen(false);
+  //     // if (microDropdownRef && !microDropdownRef.contains(e.target as Node)) {
+  //       // setMicroDropdownOpen(false);
   //     }
   //   }
   //   document.addEventListener('mousedown', handleClick);
