@@ -181,7 +181,8 @@ const SetGoal: React.FC = () => {
         } catch (error) {
           console.error('Error fetching AI suggestion:', error);
           setAiPending(false);
-          alert(`Failed to get AI suggestions: ${error.message}`);
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+          alert(`Failed to get AI suggestions: ${errorMessage}`);
         }
       }
     }
