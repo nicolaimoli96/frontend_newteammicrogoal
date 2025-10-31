@@ -150,7 +150,7 @@ const SetGoal: React.FC = () => {
         try {
           // Use Netlify function proxy to avoid CORS issues
           const apiUrl = process.env.REACT_APP_API_URL || '';
-          const endpoint = apiUrl ? `${apiUrl}/api/suggest-category` : '/.netlify/functions/suggest-category';
+          const endpoint = apiUrl ? `${apiUrl}/api/recommend-categories` : '/.netlify/functions/suggest-category';
           const res = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
