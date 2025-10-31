@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './SetGoal.css';
-import { FaPoundSign, FaStar, FaBolt, FaCloudSun } from 'react-icons/fa';
+// Icons removed - not currently used
 
 const DAYS = [
   { label: 'Monday', value: 1 },
@@ -184,8 +184,6 @@ const SetGoal: React.FC = () => {
     }
   };
 
-  const microDropdownRef = useRef<HTMLDivElement>(null);
-
   // Close dropdown on outside click (commented out as micro dropdown functionality is not currently used)
   // useEffect(() => {
   //   if (!microDropdownOpen) return;
@@ -355,7 +353,6 @@ const SetGoal: React.FC = () => {
                 type="button"
                 className="deselect-all-button"
                 onClick={() => {
-                  const filteredSites = allSites.filter(site => site !== 'TRG Covent Garden');
                   setComparisonSites(['TRG Covent Garden']);
                 }}
               >
