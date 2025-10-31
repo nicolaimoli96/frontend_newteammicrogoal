@@ -161,16 +161,27 @@ const SetGoal: React.FC = () => {
             })
           });
           if (!res.ok) {
-            throw new Error('API request failed');
+            const errorData = await res.json().catch(() => ({ error: 'Unknown error' }));
+            console.error('API error response:', errorData);
+            throw new Error(errorData.error || `API request failed with status ${res.status}`);
           }
           const data = await res.json();
           setAiPending(false);
-          setAiModal(data.suggestions);  // Array of top 3 {category, quantity}
+          
+          // Handle different response formats
+          if (data.suggestions && Array.isArray(data.suggestions)) {
+            setAiModal(data.suggestions);  // Array of top 3 {category, quantity}
+          } else if (data.category && data.quantity) {
+            // Single suggestion format - convert to array
+            setAiModal([{ category: data.category, quantity: data.quantity }]);
+          } else {
+            throw new Error('Unexpected response format from API');
+          }
           setSelectedSuggestion(0);  // Default to first suggestion
         } catch (error) {
           console.error('Error fetching AI suggestion:', error);
           setAiPending(false);
-          // Optional: Show error message to user
+          alert(`Failed to get AI suggestions: ${error.message}`);
         }
       }
     }
