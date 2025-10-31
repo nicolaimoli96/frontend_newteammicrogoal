@@ -148,7 +148,7 @@ const SetGoal: React.FC = () => {
         // AI mode - get suggestions
         setAiPending(true);
         try {
-          const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+          const apiUrl = process.env.REACT_APP_API_URL || 'https://microgoals-ai-backend-new-1.onrender.com';
           const res = await fetch(`${apiUrl}/api/suggest-category`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

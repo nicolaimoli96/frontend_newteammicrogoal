@@ -9,4 +9,5 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  REACT_APP_API_URL = "https://microgoals-ai-backend-new-1.onrender.com"
 
