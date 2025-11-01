@@ -148,17 +148,26 @@ const SetGoal: React.FC = () => {
         // AI mode - get suggestions
         setAiPending(true);
         try {
+          // Validate inputs before sending
+          if (microDay === undefined || microHour === undefined || !microWeather) {
+            throw new Error('Please fill in all micro goal fields (day, hour, weather)');
+          }
+          
+          const requestData = {
+            day_of_week: Number(microDay),
+            hour: Number(microHour),
+            weather: microWeather
+          };
+          
+          console.log('Sending AI request:', requestData);
+          
           // Use Netlify function proxy to avoid CORS issues
           const apiUrl = process.env.REACT_APP_API_URL || '';
           const endpoint = apiUrl ? `${apiUrl}/api/recommend-categories` : '/.netlify/functions/suggest-category';
           const res = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              day_of_week: microDay,
-              hour: microHour,
-              weather: microWeather
-            })
+            body: JSON.stringify(requestData)
           });
           if (!res.ok) {
             const errorData = await res.json().catch(() => ({ error: 'Unknown error' }));
