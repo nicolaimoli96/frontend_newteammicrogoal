@@ -74,7 +74,23 @@ exports.handler = async (event, context) => {
 
     // Check if response is ok
     if (!response.ok) {
-      const errorText = await response.text();
+      let errorText;
+      try {
+        errorText = await response.text();
+      } catch (e) {
+        errorText = `Could not read error response: ${e.message}`;
+      }
+      
+      console.error('Backend error:', response.status, errorText);
+      
+      // Try to parse as JSON for better error display
+      let errorData;
+      try {
+        errorData = JSON.parse(errorText);
+      } catch {
+        errorData = { error: errorText };
+      }
+      
       return {
         statusCode: response.status,
         headers: {
@@ -84,8 +100,9 @@ exports.handler = async (event, context) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ 
-          error: `Backend error: ${response.status} ${response.statusText}`,
-          details: errorText
+          error: `Backend error (${response.status}): ${errorData.error || response.statusText}`,
+          details: errorText,
+          requestBody: requestBody // Include what we sent for debugging
         })
       };
     }
