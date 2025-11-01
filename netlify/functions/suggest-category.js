@@ -32,9 +32,9 @@ exports.handler = async (event, context) => {
       requestBody = JSON.parse(event.body);
       console.log('Received request body:', requestBody);
       
-      // Validate required fields
-      if (!requestBody.hasOwnProperty('day_of_week') || 
-          !requestBody.hasOwnProperty('hour') || 
+      // Validate required fields (backend expects: day, session, weather, waiter)
+      if (!requestBody.hasOwnProperty('day') || 
+          !requestBody.hasOwnProperty('session') || 
           !requestBody.hasOwnProperty('weather')) {
         return {
           statusCode: 400,
@@ -43,7 +43,7 @@ exports.handler = async (event, context) => {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({ 
-            error: 'Missing required fields: day_of_week, hour, weather',
+            error: 'Missing required fields: day, session, weather',
             received: requestBody
           })
         };
