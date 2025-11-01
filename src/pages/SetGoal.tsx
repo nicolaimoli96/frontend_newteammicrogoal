@@ -153,10 +153,31 @@ const SetGoal: React.FC = () => {
             throw new Error('Please fill in all micro goal fields (day, hour, weather)');
           }
           
+          // Map day number to day name
+          const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+          const dayName = dayNames[Number(microDay)];
+          
+          // Map hour to session
+          const hour = Number(microHour);
+          let session;
+          if (hour >= 6 && hour < 12) {
+            session = 'Breakfast';
+          } else if (hour >= 12 && hour < 17) {
+            session = 'Lunch';
+          } else if (hour >= 17 && hour < 22) {
+            session = 'Dinner';
+          } else {
+            session = 'Lunch'; // Default fallback
+          }
+          
+          // Capitalize weather
+          const weatherCapitalized = microWeather.charAt(0).toUpperCase() + microWeather.slice(1);
+          
           const requestData = {
-            day_of_week: Number(microDay),
-            hour: Number(microHour),
-            weather: microWeather
+            day: dayName,
+            session: session,
+            weather: weatherCapitalized,
+            waiter: 'System' // Default waiter name, can be made configurable later
           };
           
           console.log('Sending AI request:', requestData);
@@ -177,12 +198,14 @@ const SetGoal: React.FC = () => {
           const data = await res.json();
           setAiPending(false);
           
-          // Handle different response formats
-          if (data.suggestions && Array.isArray(data.suggestions)) {
-            setAiModal(data.suggestions);  // Array of top 3 {category, quantity}
-          } else if (data.category && data.quantity) {
-            // Single suggestion format - convert to array
-            setAiModal([{ category: data.category, quantity: data.quantity }]);
+          // Handle backend response format: {recommendations: [{category, predicted_quantity, target_quantity}, ...]}
+          if (data.recommendations && Array.isArray(data.recommendations)) {
+            // Map to our expected format: {category, quantity}
+            const suggestions = data.recommendations.map((rec: any) => ({
+              category: rec.category,
+              quantity: rec.target_quantity || rec.predicted_quantity || 1
+            }));
+            setAiModal(suggestions);
           } else {
             throw new Error('Unexpected response format from API');
           }
