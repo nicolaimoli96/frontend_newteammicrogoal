@@ -1,6 +1,11 @@
 [build]
   publish = "build"
-  command = "npm run build"
+  command = "npm run build && cd mobile-app && npm install && npm run build && cd .. && mkdir -p build/mobile && cp -r mobile-app/build/* build/mobile/"
+
+[[redirects]]
+  from = "/mobile/*"
+  to = "/mobile/index.html"
+  status = 200
 
 [[redirects]]
   from = "/*"

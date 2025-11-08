@@ -17,13 +17,11 @@ const Sidebar: React.FC = () => {
           Competition Management
         </NavLink>
         <a 
-          href="https://waiter-frontend.netlify.app/" 
-          target="_blank" 
-          rel="noopener noreferrer"
+          href="/mobile" 
           className="mobile-app-link"
-          style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #2e3646' }}
+          style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #2e3646', fontSize: '0.9rem', padding: '0.4rem 1rem' }}
         >
-          📱 Mobile App
+          📱
         </a>
       </nav>
     </div>
