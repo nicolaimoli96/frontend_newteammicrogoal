@@ -16,6 +16,15 @@ const Sidebar: React.FC = () => {
         <NavLink to="/competition" className={({ isActive }) => isActive ? 'active' : ''}>
           Competition Management
         </NavLink>
+        <a 
+          href="https://waiter-frontend.netlify.app/" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="mobile-app-link"
+          style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #2e3646' }}
+        >
+          📱 Mobile App
+        </a>
       </nav>
     </div>
   );

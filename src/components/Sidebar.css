@@ -60,4 +60,21 @@
   background: linear-gradient(90deg, #ff1493 60%, #ff8c00 100%);
   border-radius: 6px 0 0 6px;
   transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mobile-app-link {
+  color: #b0b8c1;
+  text-decoration: none;
+  font-size: 1.1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: background 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mobile-app-link:hover {
+  background: #2e3646;
+  color: #fff;
 } 
