@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Competition.css';
-import { FaClock, FaTag, FaHashtag, FaUsers, FaRobot } from 'react-icons/fa';
+import { FaClock, FaTag, FaHashtag, FaUsers } from 'react-icons/fa';
 
 const COMPETITION_CATEGORIES = [
   { label: 'Hummus', value: 'Hummus' },
