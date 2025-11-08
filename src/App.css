@@ -16,15 +16,3 @@
 .App {
   text-align: left;
 }
-
-/* Mobile Responsive */
-@media (max-width: 768px) {
-  .app-layout {
-    flex-direction: column;
-  }
-
-  .main-content {
-    width: 100%;
-    padding-top: 70px; /* Space for hamburger menu */
-  }
-}
