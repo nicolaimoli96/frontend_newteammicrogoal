@@ -8,10 +8,13 @@ interface ProgressCircleProps {
   reviewsMax: number;
   microGoalValue?: number;
   microGoalMax?: number;
+  competitionValue?: number;
+  competitionMax?: number;
   showMicroGoal?: boolean;
   salesGoalSet?: boolean;
   reviewsGoalSet?: boolean;
   microGoalSet?: boolean;
+  competitionSet?: boolean;
 }
 
 const ProgressCircle: React.FC<ProgressCircleProps> = ({ 
@@ -21,20 +24,26 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
   reviewsMax, 
   microGoalValue = 0, 
   microGoalMax = 1,
+  competitionValue = 0,
+  competitionMax = 1,
   showMicroGoal = true,
   salesGoalSet = true,
   reviewsGoalSet = true,
-  microGoalSet = true
+  microGoalSet = true,
+  competitionSet = false
 }) => {
-  const outerRadius = 90; // Larger pink sales ring
-  const innerRadius = 74; // Green reviews ring
-  const microRadius = 58; // Orange micro goal ring (74 - 16)
+  const competitionRadius = 112; // Yellow competition ring - outermost (largest)
+  const outerRadius = 90; // Pink sales ring - second largest
+  const innerRadius = 74; // Green reviews ring - third largest
+  const microRadius = 58; // Orange micro goal ring - innermost (smallest)
   const stroke = 16;
+  const competitionStroke = 20; // Thicker stroke for competition ring
   
   // Refs for animated circles
   const salesRef = useRef<SVGCircleElement>(null);
   const reviewsRef = useRef<SVGCircleElement>(null);
   const microRef = useRef<SVGCircleElement>(null);
+  const competitionRef = useRef<SVGCircleElement>(null);
   
   // State to track when animations are complete
   const [animationsComplete, setAnimationsComplete] = useState(false);
@@ -62,10 +71,17 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
   const microProgress = microGoalMax ? Math.min(microGoalValue / microGoalMax, 1) : 0;
   const microStrokeDashoffset = microCircumference * (1 - Math.min(microProgress, 1));
 
+  // Competition ring calculations
+  const competitionNormalizedRadius = competitionRadius - competitionStroke / 2;
+  const competitionCircumference = competitionNormalizedRadius * 2 * Math.PI;
+  const competitionProgress = competitionMax ? Math.min(competitionValue / competitionMax, 1) : 0;
+  const competitionStrokeDashoffset = competitionCircumference * (1 - Math.min(competitionProgress, 1));
+
   // Add animated dashoffset state for each ring
   const [animatedSalesDashoffset, setAnimatedSalesDashoffset] = useState(salesCircumference);
   const [animatedReviewsDashoffset, setAnimatedReviewsDashoffset] = useState(reviewsCircumference);
   const [animatedMicroDashoffset, setAnimatedMicroDashoffset] = useState(microCircumference);
+  const [animatedCompetitionDashoffset, setAnimatedCompetitionDashoffset] = useState(competitionCircumference);
 
   // Animate sales ring
   useEffect(() => {
@@ -91,6 +107,14 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
     });
   }, [microStrokeDashoffset, microCircumference]);
 
+  // Animate competition ring
+  useEffect(() => {
+    setAnimatedCompetitionDashoffset(competitionCircumference);
+    requestAnimationFrame(() => {
+      setAnimatedCompetitionDashoffset(competitionStrokeDashoffset);
+    });
+  }, [competitionStrokeDashoffset, competitionCircumference]);
+
   // Set animations complete after the animation duration
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -98,33 +122,38 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
     }, 1200); // Match the CSS transition duration
 
     return () => clearTimeout(timer);
-  }, [salesProgress, reviewsProgress, microProgress]);
+  }, [salesProgress, reviewsProgress, microProgress, competitionProgress]);
 
   // Robust tick/trophy logic - only show if animations are complete and all goals are set
   const tol = 0.001;
   const salesDone = salesProgress >= 1 - tol && salesGoalSet;
   const reviewsDone = reviewsProgress >= 1 - tol && reviewsGoalSet;
   const microDone = microProgress >= 1 - tol && microGoalSet;
+  const competitionDone = competitionProgress >= 1 - tol && competitionSet;
   
-  let tickType: 'trophy' | 'pink' | 'green' | 'orange' | null = null;
+  let tickType: 'trophy' | 'pink' | 'green' | 'orange' | 'yellow' | null = null;
   if (animationsComplete && salesGoalSet && reviewsGoalSet && (!showMicroGoal || microGoalSet)) {
     if (showMicroGoal) {
       if (salesDone && reviewsDone && microDone) {
         tickType = 'trophy';
-      } else if (salesDone && !reviewsDone && !microDone) {
+      } else if (salesDone && !reviewsDone && !microDone && !competitionDone) {
         tickType = 'pink';
-      } else if (!salesDone && reviewsDone && !microDone) {
+      } else if (!salesDone && reviewsDone && !microDone && !competitionDone) {
         tickType = 'green';
-      } else if (!salesDone && !reviewsDone && microDone) {
+      } else if (!salesDone && !reviewsDone && microDone && !competitionDone) {
         tickType = 'orange';
+      } else if (!salesDone && !reviewsDone && !microDone && competitionDone) {
+        tickType = 'yellow';
       }
     } else {
       if (salesDone && reviewsDone) {
         tickType = 'trophy';
-      } else if (salesDone && !reviewsDone) {
+      } else if (salesDone && !reviewsDone && !competitionDone) {
         tickType = 'pink';
-      } else if (!salesDone && reviewsDone) {
+      } else if (!salesDone && reviewsDone && !competitionDone) {
         tickType = 'green';
+      } else if (!salesDone && !reviewsDone && competitionDone) {
+        tickType = 'yellow';
       }
     }
   }
@@ -143,9 +172,11 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
 
   // 1. Make the happy image 30% smaller in both animation and final state
   const happyScale = 0.7; // 70% of previous size
+  const centerX = competitionRadius + stroke;
+  const centerY = competitionRadius + stroke;
 
   return (
-    <div style={{ position: 'relative', width: outerRadius * 2, height: outerRadius * 2 }}>
+    <div style={{ position: 'relative', width: (competitionRadius + stroke) * 2, height: (competitionRadius + stroke) * 2 }}>
       {/* Animated happy image for trophy, absolutely positioned */}
       {showBigHappy && (
         <img
@@ -153,8 +184,8 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
           alt="nic-malta-happy"
           style={{
             position: 'absolute',
-            left: shrinkHappy ? outerRadius - microRadius * happyScale : outerRadius - outerRadius * 3 * happyScale,
-            top: shrinkHappy ? outerRadius - microRadius * happyScale : outerRadius - outerRadius * 3 * happyScale,
+            left: shrinkHappy ? centerX - microRadius * happyScale : centerX - outerRadius * 3 * happyScale,
+            top: shrinkHappy ? centerY - microRadius * happyScale : centerY - outerRadius * 3 * happyScale,
             width: shrinkHappy ? microRadius * 2 * happyScale : outerRadius * 6 * happyScale,
             height: shrinkHappy ? microRadius * 2 * happyScale : outerRadius * 6 * happyScale,
             pointerEvents: 'none',
@@ -172,8 +203,8 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
           alt="nic-malta-happy"
           style={{
             position: 'absolute',
-            left: outerRadius - microRadius * happyScale,
-            top: outerRadius - microRadius * happyScale,
+            left: centerX - microRadius * happyScale,
+            top: centerY - microRadius * happyScale,
             width: microRadius * 2 * happyScale,
             height: microRadius * 2 * happyScale,
             pointerEvents: 'none',
@@ -184,8 +215,8 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
         />
       )}
       <svg
-        height={outerRadius * 2}
-        width={outerRadius * 2}
+        height={(competitionRadius + stroke) * 2}
+        width={(competitionRadius + stroke) * 2}
         className="progress-ring"
         style={{ position: 'absolute', left: 0, top: 0 }}
       >
@@ -195,10 +226,10 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
           fill="none"
           strokeWidth={stroke}
           strokeOpacity="0.3"
-          cx={outerRadius}
-          cy={outerRadius}
+          cx={centerX}
+          cy={centerY}
           r={salesNormalizedRadius}
-          transform={`rotate(-90 ${outerRadius} ${outerRadius})`}
+          transform={`rotate(-90 ${centerX} ${centerY})`}
         />
         {/* Sales ring - progress (solid pink) - only if goal is set */}
         {salesGoalSet && (
@@ -210,16 +241,16 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
             strokeLinecap="round"
             strokeDasharray={salesCircumference}
             strokeDashoffset={animatedSalesDashoffset}
-            cx={outerRadius}
-            cy={outerRadius}
+            cx={centerX}
+            cy={centerY}
             r={salesNormalizedRadius}
             className="progress sales-progress"
-            transform={`rotate(-90 ${outerRadius} ${outerRadius})`}
+            transform={`rotate(-90 ${centerX} ${centerY})`}
           />
         )}
         {/* Sales ring starting arrow - only if goal is set */}
         {salesGoalSet && (
-          <g transform={`translate(${outerRadius}, ${outerRadius - salesNormalizedRadius}) rotate(90)`}>
+          <g transform={`translate(${centerX}, ${centerY - salesNormalizedRadius}) rotate(90)`}>
             <polygon
               points="0,-8 4,-2 0,2 -4,-2"
               fill="#c71585"
@@ -233,10 +264,10 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
           fill="none"
           strokeWidth={stroke}
           strokeOpacity="0.3"
-          cx={outerRadius}
-          cy={outerRadius}
+          cx={centerX}
+          cy={centerY}
           r={reviewsNormalizedRadius}
-          transform={`rotate(-90 ${outerRadius} ${outerRadius})`}
+          transform={`rotate(-90 ${centerX} ${centerY})`}
         />
         {/* Reviews ring - progress (solid green) - only if goal is set */}
         {reviewsGoalSet && (
@@ -248,16 +279,16 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
             strokeLinecap="round"
             strokeDasharray={reviewsCircumference}
             strokeDashoffset={animatedReviewsDashoffset}
-            cx={outerRadius}
-            cy={outerRadius}
+            cx={centerX}
+            cy={centerY}
             r={reviewsNormalizedRadius}
             className="progress reviews-progress"
-            transform={`rotate(-90 ${outerRadius} ${outerRadius})`}
+            transform={`rotate(-90 ${centerX} ${centerY})`}
           />
         )}
         {/* Reviews ring starting arrow - only if goal is set */}
         {reviewsGoalSet && (
-          <g transform={`translate(${outerRadius}, ${outerRadius - reviewsNormalizedRadius}) rotate(90)`}>
+          <g transform={`translate(${centerX}, ${centerY - reviewsNormalizedRadius}) rotate(90)`}>
             <polygon
               points="0,-6 3,-1.5 0,1.5 -3,-1.5"
               fill="#00cc6a"
@@ -274,10 +305,10 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
               fill="none"
               strokeWidth={stroke}
               strokeOpacity="0.3"
-              cx={outerRadius}
-              cy={outerRadius}
+              cx={centerX}
+              cy={centerY}
               r={microNormalizedRadius}
-              transform={`rotate(-90 ${outerRadius} ${outerRadius})`}
+              transform={`rotate(-90 ${centerX} ${centerY})`}
             />
             {/* Micro goal ring - progress (solid orange) - only if goal is set */}
             {microGoalSet && (
@@ -289,16 +320,16 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
                 strokeLinecap="round"
                 strokeDasharray={microCircumference}
                 strokeDashoffset={animatedMicroDashoffset}
-                cx={outerRadius}
-                cy={outerRadius}
+                cx={centerX}
+                cy={centerY}
                 r={microNormalizedRadius}
                 className="progress micro-progress"
-                transform={`rotate(-90 ${outerRadius} ${outerRadius})`}
+                transform={`rotate(-90 ${centerX} ${centerY})`}
               />
             )}
             {/* Micro goal ring starting arrow - only if goal is set */}
             {microGoalSet && (
-              <g transform={`translate(${outerRadius}, ${outerRadius - microNormalizedRadius}) rotate(90)`}>
+              <g transform={`translate(${centerX}, ${centerY - microNormalizedRadius}) rotate(90)`}>
                 <polygon
                   points="0,-5 2.5,-1.25 0,1.25 -2.5,-1.25"
                   fill="#e67e00"
@@ -308,6 +339,47 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
             )}
           </>
         )}
+        {/* Competition ring - only show if competition is set - OUTERMOST RING */}
+        {competitionSet && (
+          <>
+            {/* Competition ring - background (transparent yellow) - always show */}
+            <circle
+              stroke="#ffd700"
+              fill="none"
+              strokeWidth={competitionStroke}
+              strokeOpacity="0.3"
+              cx={centerX}
+              cy={centerY}
+              r={competitionNormalizedRadius}
+              transform={`rotate(-90 ${centerX} ${centerY})`}
+            />
+            {/* Competition ring - progress (solid yellow) - only if competition is set */}
+            <circle
+              ref={competitionRef}
+              stroke="#ffd700"
+              fill="none"
+              strokeWidth={competitionStroke}
+              strokeLinecap="round"
+              strokeDasharray={competitionCircumference}
+              strokeDashoffset={animatedCompetitionDashoffset}
+              cx={centerX}
+              cy={centerY}
+              r={competitionNormalizedRadius}
+              className="progress competition-progress"
+              transform={`rotate(-90 ${centerX} ${centerY})`}
+            />
+            {/* Competition ring starting arrow - only if competition is set */}
+            <g transform={`translate(${centerX}, ${centerY - competitionNormalizedRadius}) rotate(90)`}>
+              <polygon
+                points="0,-4 2,-1 0,1 -2,-1"
+                fill="#e6c200"
+                className="start-arrow"
+              />
+            </g>
+          </>
+        )}
+        
+        
         {/* Trophy or tick if completed - only show after animation and if all goals are set */}
         {tickType === 'trophy' && (
           <>
@@ -318,8 +390,8 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
                 alt="nic-malta-happy"
                 style={{
                   position: 'absolute',
-                  left: outerRadius - microRadius * happyScale,
-                  top: outerRadius - microRadius * happyScale,
+                  left: centerX - microRadius * happyScale,
+                  top: centerY - microRadius * happyScale,
                   width: microRadius * 2 * happyScale,
                   height: microRadius * 2 * happyScale,
                   pointerEvents: 'none',
@@ -335,9 +407,9 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
           <g className="tick-group">
             <polyline
               points={
-                `${outerRadius - 18},${outerRadius} ` +
-                `${outerRadius - 5},${outerRadius + 16} ` +
-                `${outerRadius + 20},${outerRadius - 12}`
+                `${centerX - 18},${centerY} ` +
+                `${centerX - 5},${centerY + 16} ` +
+                `${centerX + 20},${centerY - 12}`
               }
               fill="none"
               stroke="#ff1493"
@@ -352,9 +424,9 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
           <g className="tick-group">
             <polyline
               points={
-                `${outerRadius - 18},${outerRadius} ` +
-                `${outerRadius - 5},${outerRadius + 16} ` +
-                `${outerRadius + 20},${outerRadius - 12}`
+                `${centerX - 18},${centerY} ` +
+                `${centerX - 5},${centerY + 16} ` +
+                `${centerX + 20},${centerY - 12}`
               }
               fill="none"
               stroke="#00ff88"
@@ -369,12 +441,29 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
           <g className="tick-group">
             <polyline
               points={
-                `${outerRadius - 18},${outerRadius} ` +
-                `${outerRadius - 5},${outerRadius + 16} ` +
-                `${outerRadius + 20},${outerRadius - 12}`
+                `${centerX - 18},${centerY} ` +
+                `${centerX - 5},${centerY + 16} ` +
+                `${centerX + 20},${centerY - 12}`
               }
               fill="none"
               stroke="#ff8c00"
+              strokeWidth="8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="tick-mark"
+            />
+          </g>
+        )}
+        {tickType === 'yellow' && (
+          <g className="tick-group">
+            <polyline
+              points={
+                `${centerX - 18},${centerY} ` +
+                `${centerX - 5},${centerY + 16} ` +
+                `${centerX + 20},${centerY - 12}`
+              }
+              fill="none"
+              stroke="#ffd700"
               strokeWidth="8"
               strokeLinecap="round"
               strokeLinejoin="round"

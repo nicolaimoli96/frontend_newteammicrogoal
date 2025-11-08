@@ -20,6 +20,21 @@ const WEATHERS = [
   { label: 'Sunny', value: 'sunny' },
 ];
 
+const MICRO_CATEGORIES = [
+  { label: 'Hummus', value: 'Hummus' },
+  { label: 'Cheesecake', value: 'Cheesecake' },
+  { label: 'Water', value: 'Water' },
+  { label: 'Olives', value: 'Olives' },
+  { label: 'Dips', value: 'Dips' },
+  { label: 'Dessert', value: 'Dessert' },
+  { label: 'Drinks', value: 'Drinks' },
+  { label: 'Glass of Wine', value: 'Glass of Wine' },
+  { label: 'Appetizers', value: 'Appetizers' },
+  { label: 'Main Course', value: 'Main Course' },
+  { label: 'Side Dishes', value: 'Side Dishes' },
+  { label: 'Beverages', value: 'Beverages' },
+];
+
 const SetGoal: React.FC = () => {
   const [salesGoal, setSalesGoal] = useState<string>('');
   const [reviewsGoal, setReviewsGoal] = useState<string>('');
@@ -111,32 +126,49 @@ const SetGoal: React.FC = () => {
   const [microHour, setMicroHour] = useState<number>(19);
   const [microWeather, setMicroWeather] = useState<string>('sunny');
   const [selectedSuggestion, setSelectedSuggestion] = useState<number>(0);  // Index of selected top suggestion
+  
+  // Manual micro goal state
+  const [microGoalMode, setMicroGoalMode] = useState<'ai' | 'manual'>('ai');
+  const [manualMicroCategory, setManualMicroCategory] = useState<string>('');
+  const [manualMicroQuantity, setManualMicroQuantity] = useState<string>('');
 
   const handleSaveGoals = async (e: React.FormEvent) => {
     e.preventDefault();
     if (salesGoal && !isNaN(Number(salesGoal)) && reviewsGoal && !isNaN(Number(reviewsGoal))) {
-      setAiPending(true);
-      try {
-        const res = await fetch('http://localhost:5000/api/suggest-category', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            day_of_week: microDay,
-            hour: microHour,
-            weather: microWeather
-          })
-        });
-        if (!res.ok) {
-          throw new Error('API request failed');
+      if (microGoalMode === 'manual') {
+        // Manual mode - save directly
+        if (manualMicroCategory && manualMicroQuantity && !isNaN(Number(manualMicroQuantity))) {
+          localStorage.setItem('salesGoal', salesGoal);
+          localStorage.setItem('reviewsGoal', reviewsGoal);
+          localStorage.setItem('microGoalItem', manualMicroCategory);
+          localStorage.setItem('microGoalQuantity', manualMicroQuantity);
+          navigate('/');
         }
-        const data = await res.json();
-        setAiPending(false);
-        setAiModal(data.suggestions);  // Array of top 3 {category, quantity}
-        setSelectedSuggestion(0);  // Default to first suggestion
-      } catch (error) {
-        console.error('Error fetching AI suggestion:', error);
-        setAiPending(false);
-        // Optional: Show error message to user
+      } else {
+        // AI mode - get suggestions
+        setAiPending(true);
+        try {
+          const res = await fetch('http://localhost:5000/api/suggest-category', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              day_of_week: microDay,
+              hour: microHour,
+              weather: microWeather
+            })
+          });
+          if (!res.ok) {
+            throw new Error('API request failed');
+          }
+          const data = await res.json();
+          setAiPending(false);
+          setAiModal(data.suggestions);  // Array of top 3 {category, quantity}
+          setSelectedSuggestion(0);  // Default to first suggestion
+        } catch (error) {
+          console.error('Error fetching AI suggestion:', error);
+          setAiPending(false);
+          // Optional: Show error message to user
+        }
       }
     }
   };
@@ -151,9 +183,9 @@ const SetGoal: React.FC = () => {
     }
   };
 
-  // const microDropdownRef = useRef<HTMLDivElement>(null);
+  const microDropdownRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown on outside click (commented out as not currently used)
+  // Close dropdown on outside click (commented out as micro dropdown functionality is not currently used)
   // useEffect(() => {
   //   if (!microDropdownOpen) return;
   //   function handleClick(e: MouseEvent) {
@@ -167,109 +199,171 @@ const SetGoal: React.FC = () => {
 
   return (
     <div className="set-goal-container">
-      <h1 className="modern-title">Set Your Daily Goals</h1>
-      <p className="modern-subtitle">Boost your performance by setting clear, actionable targets for today.</p>
-      <form onSubmit={handleSaveGoals} className="modern-goal-form">
-        <div className="goal-section modern-card">
-          <div className="section-header">
-            <span className="section-icon" role="img" aria-label="Sales">{FaPoundSign({})}</span>
-            <div>
-              <h2>Sales Target</h2>
-              <p className="section-desc">Set your sales goal for the day (£).</p>
+      <h1>Set Your Daily Goals</h1>
+      <form onSubmit={handleSaveGoals}>
+        <div className="goals-section">
+          <div className="goal-section">
+            <h2>Sales Target</h2>
+            <div className="input-group">
+              <label>Sales (£)</label>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="Enter your sales goal"
+                value={salesGoal}
+                onChange={e => setSalesGoal(e.target.value)}
+                required
+              />
             </div>
           </div>
+          
+          <div className="goal-section">
+            <h2>Reviews Target</h2>
+            <div className="input-group">
+              <label>Goal</label>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                placeholder="Enter your reviews goal"
+                value={reviewsGoal}
+                onChange={e => setReviewsGoal(e.target.value)}
+                required
+              />
+            </div>
+          </div>
+          
+          <div className="goal-section">
+            <h2>Micro Goal Target</h2>
+          
+          {/* Mode Selection */}
           <div className="input-group">
-            <label>Sales (£)</label>
-            <input
-              type="number"
-              min="0"
-              step="0.01"
-              placeholder="Enter your sales goal"
-              value={salesGoal}
-              onChange={e => setSalesGoal(e.target.value)}
-              required
-            />
+            <label>Goal Setting Mode</label>
+            <div className="mode-selection">
+              <label className="mode-option">
+                <input
+                  type="radio"
+                  name="microGoalMode"
+                  value="ai"
+                  checked={microGoalMode === 'ai'}
+                  onChange={e => setMicroGoalMode(e.target.value as 'ai' | 'manual')}
+                />
+                <span>AI Suggestions (based on time & weather)</span>
+              </label>
+              <label className="mode-option">
+                <input
+                  type="radio"
+                  name="microGoalMode"
+                  value="manual"
+                  checked={microGoalMode === 'manual'}
+                  onChange={e => setMicroGoalMode(e.target.value as 'ai' | 'manual')}
+                />
+                <span>Manual Entry</span>
+              </label>
+            </div>
+          </div>
+
+          {/* AI Mode Fields */}
+          {microGoalMode === 'ai' && (
+            <>
+              <div className="input-group">
+                <label>Day of Week</label>
+                <select value={microDay} onChange={e => setMicroDay(Number(e.target.value))}>
+                  {DAYS.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
+                </select>
+              </div>
+              <div className="input-group">
+                <label>Hour</label>
+                <select value={microHour} onChange={e => setMicroHour(Number(e.target.value))}>
+                  {HOURS.map(h => <option key={h} value={h}>{h}:00</option>)}
+                </select>
+              </div>
+              <div className="input-group">
+                <label>Weather</label>
+                <select value={microWeather} onChange={e => setMicroWeather(e.target.value)}>
+                  {WEATHERS.map(w => <option key={w.value} value={w.value}>{w.label}</option>)}
+                </select>
+              </div>
+            </>
+          )}
+
+          {/* Manual Mode Fields */}
+          {microGoalMode === 'manual' && (
+            <>
+              <div className="input-group">
+                <label>Item Category</label>
+                <select 
+                  value={manualMicroCategory} 
+                  onChange={e => setManualMicroCategory(e.target.value)}
+                  required={microGoalMode === 'manual'}
+                >
+                  <option value="">Select a category</option>
+                  {MICRO_CATEGORIES.map(category => (
+                    <option key={category.value} value={category.value}>
+                      {category.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="input-group">
+                <label>Target Quantity</label>
+                <input
+                  type="number"
+                  min="1"
+                  step="1"
+                  placeholder="Enter target quantity"
+                  value={manualMicroQuantity}
+                  onChange={e => setManualMicroQuantity(e.target.value)}
+                  required={microGoalMode === 'manual'}
+                />
+              </div>
+            </>
+          )}
+          </div>
+          
+          <div className="ai-button-section">
+            <button onClick={handleSaveGoals} className="save-button" disabled={aiPending}>
+              {aiPending ? 'AI is thinking...' : microGoalMode === 'manual' ? 'Save Goals' : 'Get AI Suggestions'}
+            </button>
           </div>
         </div>
-        <div className="goal-section modern-card">
-          <div className="section-header">
-            <span className="section-icon" role="img" aria-label="Reviews">{FaStar({})}</span>
-            <div>
-              <h2>Reviews Target</h2>
-              <p className="section-desc">How many Google reviews do you want to achieve?</p>
+        
+        <div className="competing-locations-section">
+          <div className="goal-section">
+            <h2>Competing Locations</h2>
+            <div className="input-group">
+              <label>Select locations to compare with:</label>
+              <div className="site-checkbox-list">
+                {allSites.map(site => (
+                  <label key={site} className={`site-checkbox-label ${site === 'TRG Covent Garden' ? 'always-included' : ''} ${comparisonSites.includes(site) ? 'checked' : ''}`}>
+                    <input
+                      type="checkbox"
+                      checked={comparisonSites.includes(site)}
+                      onChange={() => handleCheckboxChange(site)}
+                      disabled={site === 'TRG Covent Garden'}
+                    />
+                    {site}
+                  </label>
+                ))}
+              </div>
+              <div style={{ fontSize: '0.85rem', color: '#b0b8c1', marginTop: 4 }}>
+                (TRG Covent Garden is always included)
+              </div>
+              <button 
+                type="button"
+                className="deselect-all-button"
+                onClick={() => {
+                  const filteredSites = allSites.filter(site => site !== 'TRG Covent Garden');
+                  setComparisonSites(['TRG Covent Garden']);
+                }}
+              >
+                Deselect All
+              </button>
             </div>
-          </div>
-          <div className="input-group">
-            <label>Goal</label>
-            <input
-              type="number"
-              min="0"
-              step="1"
-              placeholder="Enter your reviews goal"
-              value={reviewsGoal}
-              onChange={e => setReviewsGoal(e.target.value)}
-              required
-            />
-          </div>
-        </div>
-        <div className="goal-section modern-card">
-          <div className="section-header">
-            <span className="section-icon" role="img" aria-label="Micro Goal">{FaBolt({})}</span>
-            <div>
-              <h2>Micro Goal Target</h2>
-              <p className="section-desc">Set a micro goal based on time and weather for a specific item.</p>
-            </div>
-          </div>
-          <div className="input-group">
-            <label>Day of Week</label>
-            <select value={microDay} onChange={e => setMicroDay(Number(e.target.value))}>
-              {DAYS.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
-            </select>
-          </div>
-          <div className="input-group">
-            <label>Hour</label>
-            <select value={microHour} onChange={e => setMicroHour(Number(e.target.value))}>
-              {HOURS.map(h => <option key={h} value={h}>{h}:00</option>)}
-            </select>
-          </div>
-          <div className="input-group">
-            <label>Weather</label>
-            <select value={microWeather} onChange={e => setMicroWeather(e.target.value)}>
-              {WEATHERS.map(w => <option key={w.value} value={w.value}>{w.label}</option>)}
-            </select>
           </div>
         </div>
       </form>
-      <div className="modern-divider"><span>Site Comparison</span></div>
-      <div className="input-group modern-card" style={{ marginTop: '2rem', maxWidth: 400 }}>
-        <div className="section-header">
-          <span className="section-icon" role="img" aria-label="Sites">{FaCloudSun({})}</span>
-          <div>
-            <label>Compare with these sites (up to 9):</label>
-            <p className="section-desc">See how you stack up against other locations. Covent Garden is always included.</p>
-          </div>
-        </div>
-        <div className="site-checkbox-list">
-          {allSites.map(site => (
-            <label key={site} className={`site-checkbox-label${comparisonSites.includes(site) ? ' checked' : ''}${site === 'TRG Covent Garden' ? ' always-included' : ''}`}>
-              <input
-                type="checkbox"
-                checked={comparisonSites.includes(site)}
-                disabled={site === 'TRG Covent Garden'}
-                onChange={() => handleCheckboxChange(site)}
-              />
-              <span className="custom-checkbox" />
-              {site}
-            </label>
-          ))}
-        </div>
-        <div style={{ fontSize: '0.85rem', color: '#b0b8c1', marginTop: 4 }}>
-          (TRG Covent Garden is always included)
-        </div>
-      </div>
-      <button onClick={handleSaveGoals} className="save-button modern-save" disabled={aiPending}>
-        {aiPending ? 'AI is thinking...' : 'Save Goals'}
-      </button>
       <div className="save-feedback" style={{ display: 'none' }}>Goals saved!</div>
       {aiModal && (
         <div className="ai-modal-overlay modern-modal-overlay">

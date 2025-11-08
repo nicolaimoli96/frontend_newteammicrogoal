@@ -16,9 +16,32 @@
 .micro-progress {
   filter: drop-shadow(0 0 8px #ff8c0088);
 }
+.competition-progress {
+}
+
+
 .start-arrow {
   filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.8)) drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
 }
 .tick-mark {
   filter: drop-shadow(0 0 4px rgba(0,0,0,0.5)) drop-shadow(0 0 8px currentColor);
+}
+.competition-label {
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.7)) drop-shadow(0 0 8px #ffd70088);
+  animation: competitionPulse 2s ease-in-out infinite alternate;
+}
+.main-rings-label {
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
+}
+@keyframes competitionPulse {
+  from {
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.7)) drop-shadow(0 0 8px #ffd70088);
+  }
+  to {
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.7)) drop-shadow(0 0 16px #ffd700aa);
+  }
+}
+.ring-details {
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.8));
+  user-select: none;
 } 

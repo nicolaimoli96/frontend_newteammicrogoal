@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import './Dashboard.css';
 import WeeklyProgressCircle from '../components/WeeklyProgressCircle';
 import ProgressCircle from '../components/ProgressCircle';
@@ -11,6 +11,18 @@ const Dashboard: React.FC = () => {
   const [salesActual, setSalesActual] = useState(2000); // For test/demo
   const [reviewsActual, setReviewsActual] = useState(8); // For test/demo
   const [microGoalActual, setMicroGoalActual] = useState(10); // For test/demo
+  
+  // Competition state
+  const [competition, setCompetition] = useState<{
+    isActive: boolean;
+    startDate: string;
+    endDate: string;
+    item: string;
+    quantity: number;
+    actual: number;
+    instructions: string;
+    winnerDefinition: string;
+  } | null>(null);
 
   // Competitor data with random progress (commented out as not currently used)
   // const competitors = [
@@ -47,12 +59,19 @@ const Dashboard: React.FC = () => {
     if (storedReviewsGoal) setReviewsGoal(Number(storedReviewsGoal));
     if (storedMicroGoalItem) setMicroGoalItem(storedMicroGoalItem);
     if (storedMicroGoalQuantity) setMicroGoalQuantity(Number(storedMicroGoalQuantity));
+    
+    // Load competition data
+    const storedCompetition = localStorage.getItem('competition');
+    if (storedCompetition) {
+      setCompetition(JSON.parse(storedCompetition));
+    }
   }, []);
 
   // Progress is always actual / target
   const salesProgress = salesGoal ? salesActual / salesGoal : 0;
   const reviewsProgress = reviewsGoal ? reviewsActual / reviewsGoal : 0;
   const microGoalProgress = microGoalQuantity ? microGoalActual / microGoalQuantity : 0;
+  const competitionProgress = competition?.isActive && competition?.quantity ? competition.actual / competition.quantity : 0;
 
   // Weekly data - using fixed percentages regardless of goals being set
   const weeklyData = [
@@ -80,8 +99,8 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  // List of all sites for league board
-  const allSites = [
+  // List of all sites for league board - memoized to prevent infinite re-renders
+  const allSites = useMemo(() => [
     'TRG Marylebone',
     'TRG Covent Garden',
     'TRG Spitalfields',
@@ -110,15 +129,19 @@ const Dashboard: React.FC = () => {
     'TRG Braintree',
     'TRG Sheffield Meadowhall',
     'TRG St Pauls',
-  ];
+  ], []);
 
-  const getDefaultComparisonSites = () => {
-    const defaultSites = allSites.filter(site => site !== 'TRG Covent Garden').slice(0, 9);
-    if (!defaultSites.includes('TRG Covent Garden')) defaultSites[0] = 'TRG Covent Garden';
-    return Array.from(new Set(['TRG Covent Garden', ...defaultSites])).slice(0, 9);
-  };
+  const getDefaultComparisonSites = useMemo(() => {
+    return () => {
+      const defaultSites = allSites.filter(site => site !== 'TRG Covent Garden').slice(0, 9);
+      if (!defaultSites.includes('TRG Covent Garden')) defaultSites[0] = 'TRG Covent Garden';
+      return Array.from(new Set(['TRG Covent Garden', ...defaultSites])).slice(0, 9);
+    };
+  }, [allSites]);
 
   const [leagueSites, setLeagueSites] = useState<string[]>([]);
+  const [showInstructionsModal, setShowInstructionsModal] = useState(false);
+  const [isTableOpen, setIsTableOpen] = useState(true);
 
   useEffect(() => {
     const stored = localStorage.getItem('comparisonSites');
@@ -147,12 +170,25 @@ const Dashboard: React.FC = () => {
   // Sort by percent descending
   leagueData.sort((a, b) => b.percent - a.percent);
 
+  // Function to convert winner definition to readable format
+  const getWinnerDefinitionText = (definition: string) => {
+    const definitions: { [key: string]: string } = {
+      'team_highest_sales': 'Team with highest sales wins',
+      'individual_highest_sales': 'Individual with highest sales wins',
+      'team_hits_target': 'Any team that hits target sales wins'
+    };
+    return definitions[definition] || definition;
+  };
+
   return (
     <div className="dashboard-wrapper">
+
       <div className="dashboard-container">
         <h1>Today's Progress</h1>
+        
+        
         <div className="dashboard-content">
-          <div className="circle-wrapper">
+          <div className="center-rings">
             <ProgressCircle 
               salesValue={salesActual} 
               salesMax={salesGoal || 1} 
@@ -160,12 +196,26 @@ const Dashboard: React.FC = () => {
               reviewsMax={reviewsGoal || 1}
               microGoalValue={microGoalActual}
               microGoalMax={microGoalQuantity || 1}
+              competitionValue={competition?.actual || 0}
+              competitionMax={competition?.quantity || 1}
               salesGoalSet={!!salesGoal}
               reviewsGoalSet={!!reviewsGoal}
               microGoalSet={!!microGoalQuantity}
+              competitionSet={!!competition?.isActive}
             />
           </div>
-          <div className="progress-table">
+          
+          
+          <div className="right-table">
+            <button 
+              className="table-toggle-icon-btn"
+              onClick={() => setIsTableOpen(!isTableOpen)}
+              title={isTableOpen ? "Hide table" : "Show table"}
+            >
+              <span className="toggle-icon">{isTableOpen ? '▲' : '▼'}</span>
+            </button>
+            {isTableOpen && (
+            <div className="progress-table">
             <div className="table-header">
               <span>Metric</span>
               <span>Target</span>
@@ -217,6 +267,40 @@ const Dashboard: React.FC = () => {
               </span>
               <span className="progress-percent">{Math.round(microGoalProgress * 100)}%</span>
             </div>
+            {competition?.isActive && (
+              <div className="table-row competition-row">
+                <span className="metric-name">🏆 Competition</span>
+                <span 
+                  className="target clickable-target" 
+                  onClick={() => setShowInstructionsModal(true)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  {competition.quantity} {competition.item}
+                </span>
+                <span className="actual">
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    defaultValue={competition.actual}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        const value = e.currentTarget.value;
+                        if (!isNaN(Number(value)) && value !== '') {
+                          const updatedCompetition = { ...competition, actual: Number(value) };
+                          setCompetition(updatedCompetition);
+                          localStorage.setItem('competition', JSON.stringify(updatedCompetition));
+                        }
+                      }
+                    }}
+                    style={{ width: '50px', fontWeight: 600, fontSize: '0.95rem', background: 'transparent', color: '#fff', border: 'none', outline: 'none', textAlign: 'right' }}
+                  />
+                </span>
+                <span className="progress-percent">{Math.round(competitionProgress * 100)}%</span>
+              </div>
+            )}
+            </div>
+            )}
           </div>
         </div>
         
@@ -258,6 +342,37 @@ const Dashboard: React.FC = () => {
           ))}
         </div>
       </div>
+      
+      {/* Instructions Modal */}
+      {showInstructionsModal && (competition?.instructions || competition?.winnerDefinition) && (
+        <div className="instructions-modal-overlay" onClick={() => setShowInstructionsModal(false)}>
+          <div className="instructions-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="instructions-header">
+              <h3>🏆 Competition Details</h3>
+              <button 
+                className="close-modal-btn"
+                onClick={() => setShowInstructionsModal(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="instructions-content">
+              {competition?.winnerDefinition && (
+                <div className="winner-definition-section">
+                  <h4>🏆 Winner Criteria</h4>
+                  <p className="winner-criteria">{getWinnerDefinitionText(competition.winnerDefinition)}</p>
+                </div>
+              )}
+              {competition?.instructions && (
+                <div className="instructions-section">
+                  <h4>💬 Instructions & Motivation</h4>
+                  <p>{competition.instructions}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

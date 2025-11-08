@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
 import SetGoal from './pages/SetGoal';
+import Competition from './pages/Competition';
 import './App.css';
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/set-goal" element={<SetGoal />} />
+            <Route path="/competition" element={<Competition />} />
           </Routes>
         </main>
     </div>
