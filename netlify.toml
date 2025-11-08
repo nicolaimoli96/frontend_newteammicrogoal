@@ -3,6 +3,11 @@
   command = "npm run build && cd mobile-app && npm ci && npm run build && cd .. && mkdir -p build/mobile && cp -r mobile-app/build/* build/mobile/"
 
 [[redirects]]
+  from = "/mobile"
+  to = "/mobile/index.html"
+  status = 200
+
+[[redirects]]
   from = "/mobile/*"
   to = "/mobile/index.html"
   status = 200
