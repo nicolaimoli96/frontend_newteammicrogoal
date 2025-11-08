@@ -1,0 +1,17 @@
+[build]
+  publish = "build"
+  command = "npm run build"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = false
+
+[build.environment]
+  NODE_VERSION = "20"
+  # Using Netlify function proxy, so no need for direct backend URL
+
+[functions]
+  node_bundler = "esbuild"
+
