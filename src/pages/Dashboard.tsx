@@ -12,30 +12,30 @@ const Dashboard: React.FC = () => {
   const [reviewsActual, setReviewsActual] = useState(8); // For test/demo
   const [microGoalActual, setMicroGoalActual] = useState(10); // For test/demo
 
-  // Competitor data with random progress
-  const competitors = [
-    {
-      name: 'TRG Covent Garden',
-      salesTarget: 2500,
-      salesActual: 2500,
-      reviewsTarget: 12,
-      reviewsActual: 12
-    },
-    {
-      name: 'TRG Stratford',
-      salesTarget: 2200,
-      salesActual: 1800,
-      reviewsTarget: 10,
-      reviewsActual: 7
-    },
-    {
-      name: 'TRG SOHO',
-      salesTarget: 2800,
-      salesActual: 2400,
-      reviewsTarget: 15,
-      reviewsActual: 11
-    }
-  ];
+  // Competitor data with random progress (commented out as not currently used)
+  // const competitors = [
+  //   {
+  //     name: 'TRG Covent Garden',
+  //     salesTarget: 2500,
+  //     salesActual: 2500,
+  //     reviewsTarget: 12,
+  //     reviewsActual: 12
+  //   },
+  //   {
+  //     name: 'TRG Stratford',
+  //     salesTarget: 2200,
+  //     salesActual: 1800,
+  //     reviewsTarget: 10,
+  //     reviewsActual: 7
+  //   },
+  //   {
+  //     name: 'TRG SOHO',
+  //     salesTarget: 2800,
+  //     salesActual: 2400,
+  //     reviewsTarget: 15,
+  //     reviewsActual: 11
+  //   }
+  // ];
 
   useEffect(() => {
     const storedSalesGoal = localStorage.getItem('salesGoal');
@@ -134,7 +134,7 @@ const Dashboard: React.FC = () => {
     }
     sites = Array.from(new Set(sites)).slice(0, 9);
     setLeagueSites(['TRG Bankside', ...sites]);
-  }, [salesGoal, reviewsGoal, microGoalItem, microGoalQuantity]);
+  }, [salesGoal, reviewsGoal, microGoalItem, microGoalQuantity, allSites, getDefaultComparisonSites]);
 
   // Generate league board data
   const leagueData = leagueSites.map(site => {

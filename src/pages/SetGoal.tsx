@@ -23,19 +23,19 @@ const WEATHERS = [
 const SetGoal: React.FC = () => {
   const [salesGoal, setSalesGoal] = useState<string>('');
   const [reviewsGoal, setReviewsGoal] = useState<string>('');
-  const [microGoalItem, setMicroGoalItem] = useState<string>('');
-  const [microGoalQuantity, setMicroGoalQuantity] = useState<string>('');
+  // const [microGoalItem, setMicroGoalItem] = useState<string>('');
+  // const [microGoalQuantity, setMicroGoalQuantity] = useState<string>('');
   const navigate = useNavigate();
 
-  // Add state for micro goal tab
-  const [microTab, setMicroTab] = useState<'items' | 'category' | 'asph'>('items');
-  const microItems = ['Hummus', 'Cheesecake', 'Water', 'Olives'];
-  const microCategories = ['Dips', 'Dessert', 'Drinks', 'Glass of Wine'];
-  const [microGoalASPHAmount, setMicroGoalASPHAmount] = useState<string>(() => localStorage.getItem('microGoalASPHAmount') || '');
+  // Add state for micro goal tab (commented out as not currently used)
+  // const [microTab, setMicroTab] = useState<'items' | 'category' | 'asph'>('items');
+  // const microItems = ['Hummus', 'Cheesecake', 'Water', 'Olives'];
+  // const microCategories = ['Dips', 'Dessert', 'Drinks', 'Glass of Wine'];
+  // const [microGoalASPHAmount, setMicroGoalASPHAmount] = useState<string>(() => localStorage.getItem('microGoalASPHAmount') || '');
 
-  // Add state for dropdown open/close
-  const [microDropdownOpen, setMicroDropdownOpen] = useState(false);
-  const [microSearch, setMicroSearch] = useState('');
+  // Add state for dropdown open/close (commented out as not currently used)
+  // const [microDropdownOpen, setMicroDropdownOpen] = useState(false);
+  // const [microSearch, setMicroSearch] = useState('');
 
   const allSites = [
     'TRG Marylebone',
@@ -96,13 +96,13 @@ const SetGoal: React.FC = () => {
   useEffect(() => {
     const storedSalesGoal = localStorage.getItem('salesGoal');
     const storedReviewsGoal = localStorage.getItem('reviewsGoal');
-    const storedMicroGoalItem = localStorage.getItem('microGoalItem');
-    const storedMicroGoalQuantity = localStorage.getItem('microGoalQuantity');
+    // const storedMicroGoalItem = localStorage.getItem('microGoalItem');
+    // const storedMicroGoalQuantity = localStorage.getItem('microGoalQuantity');
     
     if (storedSalesGoal) setSalesGoal(storedSalesGoal);
     if (storedReviewsGoal) setReviewsGoal(storedReviewsGoal);
-    if (storedMicroGoalItem) setMicroGoalItem(storedMicroGoalItem);
-    if (storedMicroGoalQuantity) setMicroGoalQuantity(storedMicroGoalQuantity);
+    // if (storedMicroGoalItem) setMicroGoalItem(storedMicroGoalItem);
+    // if (storedMicroGoalQuantity) setMicroGoalQuantity(storedMicroGoalQuantity);
   }, []);
 
   const [aiModal, setAiModal] = useState<{category: string, quantity: number}[] | null>(null);
@@ -151,19 +151,19 @@ const SetGoal: React.FC = () => {
     }
   };
 
-  const microDropdownRef = useRef<HTMLDivElement>(null);
+  // const microDropdownRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown on outside click
-  useEffect(() => {
-    if (!microDropdownOpen) return;
-    function handleClick(e: MouseEvent) {
-      if (microDropdownRef.current && !microDropdownRef.current.contains(e.target as Node)) {
-        setMicroDropdownOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, [microDropdownOpen]);
+  // Close dropdown on outside click (commented out as not currently used)
+  // useEffect(() => {
+  //   if (!microDropdownOpen) return;
+  //   function handleClick(e: MouseEvent) {
+  //     if (microDropdownRef.current && !microDropdownRef.current.contains(e.target as Node)) {
+  //       setMicroDropdownOpen(false);
+  //     }
+  //   }
+  //   document.addEventListener('mousedown', handleClick);
+  //   return () => document.removeEventListener('mousedown', handleClick);
+  // }, [microDropdownOpen]);
 
   return (
     <div className="set-goal-container">

@@ -1,4 +1,4 @@
-import { Metric } from 'web-vitals';
+// import { Metric } from 'web-vitals';
 
 const reportWebVitals = (onPerfEntry?: any) => {
   // Simplified for compatibility
