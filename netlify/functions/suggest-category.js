@@ -32,10 +32,45 @@ exports.handler = async (event, context) => {
       requestBody = JSON.parse(event.body);
       console.log('Received request body:', requestBody);
       
-      // Validate required fields (backend expects: day, session, weather, waiter)
-      if (!requestBody.hasOwnProperty('day') || 
-          !requestBody.hasOwnProperty('session') || 
-          !requestBody.hasOwnProperty('weather')) {
+      // Support both formats: frontend format (day_of_week, hour) or backend format (day, session)
+      let backendRequestBody;
+      
+      if (requestBody.day_of_week !== undefined && requestBody.hour !== undefined) {
+        // Frontend format - transform to backend format
+        const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const day = dayNames[requestBody.day_of_week] || 'Mon';
+        
+        // Convert hour to session
+        let session = 'Dinner'; // default
+        if (requestBody.hour >= 11 && requestBody.hour < 15) {
+          session = 'Lunch';
+        } else if (requestBody.hour >= 15 && requestBody.hour < 18) {
+          session = 'Afternoon';
+        } else if (requestBody.hour >= 18) {
+          session = 'Dinner';
+        } else {
+          session = 'Breakfast';
+        }
+        
+        // Map weather values
+        const weatherMap = {
+          'rain': 'Rain',
+          'cloud': 'Cloud',
+          'wind': 'Wind',
+          'sunny': 'Sunny'
+        };
+        const weather = weatherMap[requestBody.weather] || requestBody.weather || 'Sunny';
+        
+        backendRequestBody = {
+          day: day,
+          session: session,
+          weather: weather,
+          waiter: requestBody.waiter || null
+        };
+      } else if (requestBody.day && requestBody.session) {
+        // Already in backend format
+        backendRequestBody = requestBody;
+      } else {
         return {
           statusCode: 400,
           headers: {
@@ -43,7 +78,7 @@ exports.handler = async (event, context) => {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({ 
-            error: 'Missing required fields: day, session, weather',
+            error: 'Missing required fields. Expected: day_of_week, hour, weather OR day, session, weather',
             received: requestBody
           })
         };
@@ -61,13 +96,13 @@ exports.handler = async (event, context) => {
     }
     
     // Forward the request to the backend
-    console.log('Sending to backend:', backendUrl, requestBody);
+    console.log('Sending to backend:', backendUrl, backendRequestBody);
     const response = await fetch(backendUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(requestBody)
+      body: JSON.stringify(backendRequestBody)
     });
     
     console.log('Backend response status:', response.status);
@@ -127,6 +162,30 @@ exports.handler = async (event, context) => {
       };
     }
 
+    // Transform backend response (recommendations) to frontend format (suggestions)
+    // Backend returns: { recommendations: [{ category, quantity }, ...] }
+    // Frontend expects: { suggestions: [{ category, quantity }, ...] }
+    let transformedData = data;
+    if (data.recommendations && Array.isArray(data.recommendations)) {
+      transformedData = {
+        suggestions: data.recommendations.map(rec => ({
+          category: rec.category || rec.name || rec.item,
+          quantity: rec.quantity || rec.target || rec.amount || 1
+        }))
+      };
+    } else if (Array.isArray(data)) {
+      // If backend returns array directly
+      transformedData = {
+        suggestions: data.map(rec => ({
+          category: rec.category || rec.name || rec.item,
+          quantity: rec.quantity || rec.target || rec.amount || 1
+        }))
+      };
+    } else if (!data.suggestions) {
+      // If it's already in the right format or needs minimal transformation
+      transformedData = data;
+    }
+
     // Return the response with CORS headers
     return {
       statusCode: 200,
@@ -136,7 +195,7 @@ exports.handler = async (event, context) => {
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(transformedData)
     };
   } catch (error) {
     console.error('Function error:', error);

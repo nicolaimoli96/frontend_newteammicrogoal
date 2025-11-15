@@ -176,7 +176,11 @@ const SetGoal: React.FC = () => {
         // AI mode - get suggestions
         setAiPending(true);
         try {
-          const res = await fetch('http://localhost:5000/api/suggest-category', {
+          // Use Netlify function in production, localhost in development
+          const apiUrl = process.env.NODE_ENV === 'production' 
+            ? '/.netlify/functions/suggest-category'
+            : 'http://localhost:5000/api/suggest-category';
+          const res = await fetch(apiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
