@@ -36,7 +36,7 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const backendUrl = 'https://microgoals-ai-backend-new-1.onrender.com/api/suggest-category';
+    const backendUrl = 'https://microgoals-ai-backend-new-1.onrender.com/api/recommend-categories';
     
     // Parse and validate request body
     let requestBody;
@@ -77,7 +77,7 @@ exports.handler = async (event, context) => {
           day: day,
           session: session,
           weather: weather,
-          waiter: requestBody.waiter || null
+          waiter: requestBody.waiter || 'default' // Backend requires waiter field, can't be null
         };
       } else if (requestBody.day && requestBody.session) {
         // Already in backend format
@@ -175,14 +175,14 @@ exports.handler = async (event, context) => {
     }
 
     // Transform backend response (recommendations) to frontend format (suggestions)
-    // Backend returns: { recommendations: [{ category, quantity }, ...] }
+    // Backend returns: { recommendations: [{ category, predicted_quantity, target_quantity }, ...] }
     // Frontend expects: { suggestions: [{ category, quantity }, ...] }
     let transformedData = data;
     if (data.recommendations && Array.isArray(data.recommendations)) {
       transformedData = {
         suggestions: data.recommendations.map(rec => ({
           category: rec.category || rec.name || rec.item,
-          quantity: rec.quantity || rec.target || rec.amount || 1
+          quantity: rec.target_quantity || rec.quantity || rec.predicted_quantity || rec.target || rec.amount || 1
         }))
       };
     } else if (Array.isArray(data)) {
