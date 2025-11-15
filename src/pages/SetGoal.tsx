@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './SetGoal.css';
 
@@ -19,19 +19,22 @@ const WEATHERS = [
   { label: 'Sunny', value: 'sunny' },
 ];
 
-const MICRO_CATEGORIES = [
-  { label: 'Hummus', value: 'Hummus' },
-  { label: 'Cheesecake', value: 'Cheesecake' },
-  { label: 'Water', value: 'Water' },
-  { label: 'Olives', value: 'Olives' },
-  { label: 'Dips', value: 'Dips' },
-  { label: 'Dessert', value: 'Dessert' },
-  { label: 'Drinks', value: 'Drinks' },
-  { label: 'Glass of Wine', value: 'Glass of Wine' },
-  { label: 'Appetizers', value: 'Appetizers' },
-  { label: 'Main Course', value: 'Main Course' },
-  { label: 'Side Dishes', value: 'Side Dishes' },
-  { label: 'Beverages', value: 'Beverages' },
+// Category options for the Category tab
+const CATEGORY_OPTIONS = [
+  'Dips',
+  'Side salads',
+  'Alcoholic drinks',
+  'Desserts'
+];
+
+// Item options for the Items tab
+const ITEM_OPTIONS = [
+  'Olives',
+  'hummus',
+  'Coke',
+  'Moussaka',
+  'Tahini and Honey dip',
+  'Portokalopita'
 ];
 
 const SetGoal: React.FC = () => {
@@ -52,6 +55,7 @@ const SetGoal: React.FC = () => {
   // const [microSearch, setMicroSearch] = useState('');
 
   const allSites = [
+    'TRG Bankside',
     'TRG Marylebone',
     'TRG Covent Garden',
     'TRG Spitalfields',
@@ -83,10 +87,8 @@ const SetGoal: React.FC = () => {
   ];
 
   const getDefaultComparisonSites = () => {
-    // Always include Covent Garden, and first 9 (if not already included)
-    const defaultSites = allSites.filter(site => site !== 'TRG Covent Garden').slice(0, 9);
-    if (!defaultSites.includes('TRG Covent Garden')) defaultSites[0] = 'TRG Covent Garden';
-    return Array.from(new Set(['TRG Covent Garden', ...defaultSites])).slice(0, 9);
+    // Only include TRG Bankside by default
+    return ['TRG Bankside'];
   };
 
   const [comparisonSites, setComparisonSites] = useState<string[]>(() => {
@@ -97,10 +99,10 @@ const SetGoal: React.FC = () => {
 
   const handleCheckboxChange = (site: string) => {
     let sites = comparisonSites.includes(site)
-      ? comparisonSites.filter(s => s !== site && s !== 'TRG Covent Garden')
+      ? comparisonSites.filter(s => s !== site && s !== 'TRG Bankside')
       : [...comparisonSites, site];
-    // Always include Covent Garden
-    if (!sites.includes('TRG Covent Garden')) sites = ['TRG Covent Garden', ...sites];
+    // Always include TRG Bankside
+    if (!sites.includes('TRG Bankside')) sites = ['TRG Bankside', ...sites];
     if (sites.length > 9) sites = sites.slice(0, 9);
     setComparisonSites(sites);
     localStorage.setItem('comparisonSites', JSON.stringify(sites));
@@ -110,13 +112,26 @@ const SetGoal: React.FC = () => {
   useEffect(() => {
     const storedSalesGoal = localStorage.getItem('salesGoal');
     const storedReviewsGoal = localStorage.getItem('reviewsGoal');
-    // const storedMicroGoalItem = localStorage.getItem('microGoalItem');
-    // const storedMicroGoalQuantity = localStorage.getItem('microGoalQuantity');
+    const storedMicroGoalItem = localStorage.getItem('microGoalItem');
+    const storedMicroGoalQuantity = localStorage.getItem('microGoalQuantity');
     
     if (storedSalesGoal) setSalesGoal(storedSalesGoal);
     if (storedReviewsGoal) setReviewsGoal(storedReviewsGoal);
-    // if (storedMicroGoalItem) setMicroGoalItem(storedMicroGoalItem);
-    // if (storedMicroGoalQuantity) setMicroGoalQuantity(storedMicroGoalQuantity);
+    if (storedMicroGoalItem) {
+      // If it's stored as "ASPH: £X", extract just "ASPH"
+      if (storedMicroGoalItem.startsWith('ASPH:')) {
+        setManualMicroCategory('ASPH');
+        const asphMatch = storedMicroGoalItem.match(/£(\d+\.?\d*)/);
+        if (asphMatch) {
+          setManualMicroQuantity(asphMatch[1]);
+        }
+      } else {
+        setManualMicroCategory(storedMicroGoalItem);
+      }
+    }
+    if (storedMicroGoalQuantity) {
+      setManualMicroQuantity(storedMicroGoalQuantity);
+    }
   }, []);
 
   const [aiModal, setAiModal] = useState<{category: string, quantity: number}[] | null>(null);
@@ -127,21 +142,35 @@ const SetGoal: React.FC = () => {
   const [selectedSuggestion, setSelectedSuggestion] = useState<number>(0);  // Index of selected top suggestion
   
   // Manual micro goal state
-  const [microGoalMode, setMicroGoalMode] = useState<'ai' | 'manual'>('ai');
+  const [microGoalMode, setMicroGoalMode] = useState<'ai' | 'manual'>('manual');
   const [manualMicroCategory, setManualMicroCategory] = useState<string>('');
   const [manualMicroQuantity, setManualMicroQuantity] = useState<string>('');
+  
+  // Tabbed dropdown state
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'category' | 'items' | 'asph'>('category');
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleSaveGoals = async (e: React.FormEvent) => {
     e.preventDefault();
     if (salesGoal && !isNaN(Number(salesGoal)) && reviewsGoal && !isNaN(Number(reviewsGoal))) {
       if (microGoalMode === 'manual') {
         // Manual mode - save directly
-        if (manualMicroCategory && manualMicroQuantity && !isNaN(Number(manualMicroQuantity))) {
+        const isAsph = manualMicroCategory === 'ASPH';
+        const hasValidCategory = manualMicroCategory && manualMicroCategory.trim() !== '';
+        const hasValidQuantity = manualMicroQuantity && !isNaN(Number(manualMicroQuantity)) && Number(manualMicroQuantity) > 0;
+        
+        if (hasValidCategory && hasValidQuantity) {
           localStorage.setItem('salesGoal', salesGoal);
           localStorage.setItem('reviewsGoal', reviewsGoal);
-          localStorage.setItem('microGoalItem', manualMicroCategory);
+          // For ASPH, save as "ASPH: £X" format, otherwise save as is
+          const savedCategory = isAsph ? `ASPH: £${manualMicroQuantity}` : manualMicroCategory;
+          localStorage.setItem('microGoalItem', savedCategory);
           localStorage.setItem('microGoalQuantity', manualMicroQuantity);
           navigate('/');
+        } else {
+          // Show error or feedback if validation fails
+          console.error('Validation failed:', { hasValidCategory, hasValidQuantity, isAsph, manualMicroCategory, manualMicroQuantity });
         }
       } else {
         // AI mode - get suggestions
@@ -182,18 +211,32 @@ const SetGoal: React.FC = () => {
     }
   };
 
-  // Close dropdown on outside click (commented out as micro dropdown functionality is not currently used)
-  // const microDropdownRef = useRef<HTMLDivElement>(null);
-  // useEffect(() => {
-  //   if (!microDropdownOpen) return;
-  //   function handleClick(e: MouseEvent) {
-  //     if (microDropdownRef.current && !microDropdownRef.current.contains(e.target as Node)) {
-  //       setMicroDropdownOpen(false);
-  //     }
-  //   }
-  //   document.addEventListener('mousedown', handleClick);
-  //   return () => document.removeEventListener('mousedown', handleClick);
-  // }, [microDropdownOpen]);
+  // Close dropdown on outside click
+  useEffect(() => {
+    if (!dropdownOpen) return;
+    function handleClick(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [dropdownOpen]);
+
+  // Handle category/item selection
+  const handleCategoryItemSelect = (value: string) => {
+    setManualMicroCategory(value);
+    // Clear quantity when switching items (user will enter new value)
+    setManualMicroQuantity('');
+    setDropdownOpen(false);
+  };
+
+  // Handle ASPH selection (from ASPH tab)
+  const handleAsphSelect = () => {
+    setManualMicroCategory('ASPH');
+    setManualMicroQuantity('');
+    setDropdownOpen(false);
+  };
 
   return (
     <div className="set-goal-container">
@@ -290,27 +333,90 @@ const SetGoal: React.FC = () => {
           {microGoalMode === 'manual' && (
             <>
               <div className="input-group">
-                <label>Item Category</label>
-                <select 
-                  value={manualMicroCategory} 
-                  onChange={e => setManualMicroCategory(e.target.value)}
-                  required={microGoalMode === 'manual'}
-                >
-                  <option value="">Select a category</option>
-                  {MICRO_CATEGORIES.map(category => (
-                    <option key={category.value} value={category.value}>
-                      {category.label}
-                    </option>
-                  ))}
-                </select>
+                <label>MicroGoal category</label>
+                <div className="custom-dropdown-wrapper" ref={dropdownRef}>
+                  <button
+                    type="button"
+                    className="custom-dropdown-trigger"
+                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                  >
+                    <span>{manualMicroCategory || 'Select a category'}</span>
+                    <span className="dropdown-arrow">{dropdownOpen ? '▲' : '▼'}</span>
+                  </button>
+                  {dropdownOpen && (
+                    <div className="custom-dropdown">
+                      <div className="dropdown-tabs">
+                        <button
+                          type="button"
+                          className={`tab-button ${activeTab === 'category' ? 'active' : ''}`}
+                          onClick={() => setActiveTab('category')}
+                        >
+                          Category
+                        </button>
+                        <button
+                          type="button"
+                          className={`tab-button ${activeTab === 'items' ? 'active' : ''}`}
+                          onClick={() => setActiveTab('items')}
+                        >
+                          Items
+                        </button>
+                        <button
+                          type="button"
+                          className={`tab-button ${activeTab === 'asph' ? 'active' : ''}`}
+                          onClick={() => setActiveTab('asph')}
+                        >
+                          ASPH
+                        </button>
+                      </div>
+                      <div className="dropdown-content">
+                        {activeTab === 'category' && (
+                          <div className="dropdown-options">
+                            {CATEGORY_OPTIONS.map(option => (
+                              <div
+                                key={option}
+                                className={`dropdown-option ${manualMicroCategory === option ? 'selected' : ''}`}
+                                onClick={() => handleCategoryItemSelect(option)}
+                              >
+                                {option}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {activeTab === 'items' && (
+                          <div className="dropdown-options">
+                            {ITEM_OPTIONS.map(option => (
+                              <div
+                                key={option}
+                                className={`dropdown-option ${manualMicroCategory === option ? 'selected' : ''}`}
+                                onClick={() => handleCategoryItemSelect(option)}
+                              >
+                                {option}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {activeTab === 'asph' && (
+                          <div className="dropdown-options">
+                            <div
+                              className={`dropdown-option ${manualMicroCategory === 'ASPH' ? 'selected' : ''}`}
+                              onClick={handleAsphSelect}
+                            >
+                              ASPH
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
               <div className="input-group">
-                <label>Target Quantity</label>
+                <label>{manualMicroCategory === 'ASPH' ? 'Target ASPH (£)' : 'Target Quantity'}</label>
                 <input
                   type="number"
-                  min="1"
-                  step="1"
-                  placeholder="Enter target quantity"
+                  min={manualMicroCategory === 'ASPH' ? '0' : '1'}
+                  step={manualMicroCategory === 'ASPH' ? '0.01' : '1'}
+                  placeholder={manualMicroCategory === 'ASPH' ? 'Enter target ASPH in £' : 'Enter target quantity'}
                   value={manualMicroQuantity}
                   onChange={e => setManualMicroQuantity(e.target.value)}
                   required={microGoalMode === 'manual'}
@@ -334,25 +440,22 @@ const SetGoal: React.FC = () => {
               <label>Select locations to compare with:</label>
               <div className="site-checkbox-list">
                 {allSites.map(site => (
-                  <label key={site} className={`site-checkbox-label ${site === 'TRG Covent Garden' ? 'always-included' : ''} ${comparisonSites.includes(site) ? 'checked' : ''}`}>
+                  <label key={site} className={`site-checkbox-label ${site === 'TRG Bankside' ? 'always-included' : ''} ${comparisonSites.includes(site) ? 'checked' : ''}`}>
                     <input
                       type="checkbox"
                       checked={comparisonSites.includes(site)}
                       onChange={() => handleCheckboxChange(site)}
-                      disabled={site === 'TRG Covent Garden'}
+                      disabled={site === 'TRG Bankside'}
                     />
                     {site}
                   </label>
                 ))}
               </div>
-              <div style={{ fontSize: '0.85rem', color: '#b0b8c1', marginTop: 4 }}>
-                (TRG Covent Garden is always included)
-              </div>
               <button 
                 type="button"
                 className="deselect-all-button"
                 onClick={() => {
-                  setComparisonSites(['TRG Covent Garden']);
+                  setComparisonSites(['TRG Bankside']);
                 }}
               >
                 Deselect All

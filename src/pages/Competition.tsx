@@ -16,6 +16,7 @@ const COMPETITION_CATEGORIES = [
   { label: 'Main Course', value: 'Main Course' },
   { label: 'Side Dishes', value: 'Side Dishes' },
   { label: 'Beverages', value: 'Beverages' },
+  { label: 'ASPH', value: 'ASPH' },
 ];
 
 const Competition: React.FC = () => {

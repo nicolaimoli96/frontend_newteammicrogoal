@@ -16,13 +16,6 @@ const Sidebar: React.FC = () => {
         <NavLink to="/competition" className={({ isActive }) => isActive ? 'active' : ''}>
           Competition Management
         </NavLink>
-        <a 
-          href="/mobile" 
-          className="mobile-app-link"
-          style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #2e3646', fontSize: '0.9rem', padding: '0.4rem 1rem' }}
-        >
-          📱
-        </a>
       </nav>
     </div>
   );

@@ -183,9 +183,68 @@
   color: rgba(255, 255, 255, 0.5);
 }
 
-.input-group-compact select option {
-  background: #23272f;
+/* Enhanced dropdown styling - Beautiful matching SetGoal page style */
+.input-group-compact {
+  position: relative;
+}
+
+.input-group-compact select {
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #2e3646;
+  font-size: 1.1rem;
+  background: #181c24;
   color: #fff;
+  outline: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'%3E%3Cpath fill='%23ffd700' d='M7 10L3 5h8z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.8rem center;
+  background-size: 14px;
+  padding-right: 2.8rem;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  position: relative;
+  z-index: 1;
+}
+
+.input-group-compact select:hover {
+  border-color: #ffd700;
+  background: rgba(24, 28, 36, 0.95);
+  box-shadow: 0 4px 16px rgba(255, 215, 0, 0.2);
+  transform: translateY(-1px);
+}
+
+.input-group-compact select:focus {
+  border-color: #ffd700;
+  background: rgba(24, 28, 36, 0.98);
+  box-shadow: 
+    0 0 0 3px rgba(255, 215, 0, 0.25),
+    0 6px 20px rgba(255, 215, 0, 0.3);
+  transform: translateY(-1px);
+}
+
+.input-group-compact select option {
+  background: #181c24;
+  color: #fff;
+  padding: 0.9rem 1rem;
+  font-weight: 500;
+  border: none;
+}
+
+.input-group-compact select option:hover {
+  background: rgba(255, 215, 0, 0.15);
+  color: #ffd700;
+}
+
+.input-group-compact select option:checked {
+  background: rgba(255, 215, 0, 0.25);
+  color: #ffd700;
+  font-weight: 600;
 }
 
 .input-group-compact textarea {

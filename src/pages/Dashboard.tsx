@@ -131,13 +131,6 @@ const Dashboard: React.FC = () => {
     'TRG St Pauls',
   ], []);
 
-  const getDefaultComparisonSites = useMemo(() => {
-    return () => {
-      const defaultSites = allSites.filter(site => site !== 'TRG Covent Garden').slice(0, 9);
-      if (!defaultSites.includes('TRG Covent Garden')) defaultSites[0] = 'TRG Covent Garden';
-      return Array.from(new Set(['TRG Covent Garden', ...defaultSites])).slice(0, 9);
-    };
-  }, [allSites]);
 
   const [leagueSites, setLeagueSites] = useState<string[]>([]);
   const [showInstructionsModal, setShowInstructionsModal] = useState(false);
@@ -145,27 +138,21 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     const stored = localStorage.getItem('comparisonSites');
-    let sites: string[] = stored ? JSON.parse(stored) : getDefaultComparisonSites();
-    // Always include TRG Covent Garden
-    if (!sites.includes('TRG Covent Garden')) sites = ['TRG Covent Garden', ...sites];
-    // Fill with randoms if less than 9
-    if (sites.length < 9) {
-      const pool = allSites.filter(site => !['TRG Bankside', ...sites].includes(site));
-      const shuffled = pool.sort(() => 0.5 - Math.random());
-      const needed = 9 - sites.length;
-      sites = [...sites, ...shuffled.slice(0, needed)];
-    }
-    sites = Array.from(new Set(sites)).slice(0, 9);
-    setLeagueSites(['TRG Bankside', ...sites]);
-  }, [salesGoal, reviewsGoal, microGoalItem, microGoalQuantity, allSites, getDefaultComparisonSites]);
+    let sites: string[] = stored ? JSON.parse(stored) : ['TRG Bankside'];
+    // Remove TRG Bankside from sites if it exists (we'll add it separately)
+    sites = sites.filter(site => site !== 'TRG Bankside');
+    // Use only the selected sites, don't fill with random ones
+    // Ensure TRG Bankside is only added once at the front
+    setLeagueSites(['TRG Bankside', ...sites.filter(site => site !== 'TRG Bankside')]);
+  }, [salesGoal, reviewsGoal, microGoalItem, microGoalQuantity]);
 
   // Generate league board data
   const leagueData = leagueSites.map(site => {
     if (site === 'TRG Bankside') {
       return { name: site, percent: Math.round((salesGoal ? salesActual / salesGoal : 0) * 100), isUser: true };
     }
-    // Fake data for other sites
-    return { name: site, percent: Math.floor(Math.random() * 41) + 60, isUser: false }; // 60-100%
+    // Fake data for other sites - between 40% and 60%
+    return { name: site, percent: Math.floor(Math.random() * 21) + 40, isUser: false }; // 40-60%
   });
   // Sort by percent descending
   leagueData.sort((a, b) => b.percent - a.percent);
@@ -254,7 +241,13 @@ const Dashboard: React.FC = () => {
             </div>
             <div className="table-row micro-row">
               <span className="metric-name">Micro Goal</span>
-              <span className="target">{microGoalQuantity ? `${microGoalQuantity} ${microGoalItem}` : 'Not set'}</span>
+              <span className="target">
+                {microGoalQuantity && microGoalItem 
+                  ? (microGoalItem.startsWith('ASPH:') 
+                      ? microGoalItem 
+                      : `${microGoalQuantity} ${microGoalItem}`)
+                  : 'Not set'}
+              </span>
               <span className="actual">
                 <input
                   type="number"
