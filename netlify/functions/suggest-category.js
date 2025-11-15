@@ -1,4 +1,16 @@
+// Netlify functions have fetch available in Node.js 18+
 exports.handler = async (event, context) => {
+  // Ensure fetch is available (Node 18+ has it built-in)
+  if (typeof fetch === 'undefined') {
+    return {
+      statusCode: 500,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ error: 'Fetch API not available in this environment' })
+    };
+  }
   // Handle CORS preflight requests
   if (event.httpMethod === 'OPTIONS') {
     return {
