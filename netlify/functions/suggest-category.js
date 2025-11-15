@@ -40,12 +40,12 @@ exports.handler = async (event, context) => {
     
     // Parse and validate request body
     let requestBody;
+    let backendRequestBody;
     try {
       requestBody = JSON.parse(event.body);
       console.log('Received request body:', requestBody);
       
       // Support both formats: frontend format (day_of_week, hour) or backend format (day, session)
-      let backendRequestBody;
       
       if (requestBody.day_of_week !== undefined && requestBody.hour !== undefined) {
         // Frontend format - transform to backend format
@@ -149,7 +149,7 @@ exports.handler = async (event, context) => {
         body: JSON.stringify({ 
           error: `Backend error (${response.status}): ${errorData.error || response.statusText}`,
           details: errorText,
-          requestBody: requestBody // Include what we sent for debugging
+          requestBody: backendRequestBody || requestBody // Include what we sent for debugging
         })
       };
     }
