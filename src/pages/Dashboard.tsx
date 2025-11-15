@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import './Dashboard.css';
 import WeeklyProgressCircle from '../components/WeeklyProgressCircle';
 import ProgressCircle from '../components/ProgressCircle';
