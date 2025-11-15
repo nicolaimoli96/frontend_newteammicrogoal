@@ -99,37 +99,6 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  // List of all sites for league board - memoized to prevent infinite re-renders
-  const allSites = useMemo(() => [
-    'TRG Marylebone',
-    'TRG Covent Garden',
-    'TRG Spitalfields',
-    'TRG Westfield',
-    'TRG Stratford Westfield',
-    'TRG Windsor',
-    'TRG Soho',
-    'TRG St Martins Lane',
-    'TRG Muswell Hill',
-    'TRG Southampton',
-    'TRG Bournemouth',
-    'TRG Dulwich',
-    'TRG Bristol',
-    'TRG The Strand',
-    'TRG Tower Bridge',
-    'TRG Bracknell',
-    'TRG Norwich',
-    'TRG Bluewater',
-    'TRG Manchester',
-    'TRG Trafford Centre',
-    'TRG Solihull',
-    'TRG Gloucester Quays',
-    'TRG Edinburgh',
-    'TRG Glasgow',
-    'TRG Liverpool',
-    'TRG Braintree',
-    'TRG Sheffield Meadowhall',
-    'TRG St Pauls',
-  ], []);
 
 
   const [leagueSites, setLeagueSites] = useState<string[]>([]);
