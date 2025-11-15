@@ -24,7 +24,7 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const backendUrl = 'https://microgoals-ai-backend-new-1.onrender.com/api/recommend-categories';
+    const backendUrl = 'https://microgoals-ai-backend-new-1.onrender.com/api/suggest-category';
     
     // Parse and validate request body
     let requestBody;

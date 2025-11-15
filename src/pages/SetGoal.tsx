@@ -191,7 +191,14 @@ const SetGoal: React.FC = () => {
             })
           });
           if (!res.ok) {
-            throw new Error('API request failed');
+            const errorText = await res.text();
+            let errorData;
+            try {
+              errorData = JSON.parse(errorText);
+            } catch {
+              errorData = { error: errorText || `Request failed with status ${res.status}` };
+            }
+            throw new Error(errorData.error || `API request failed with status ${res.status}`);
           }
           const data = await res.json();
           setAiPending(false);
@@ -200,7 +207,7 @@ const SetGoal: React.FC = () => {
         } catch (error) {
           console.error('Error fetching AI suggestion:', error);
           setAiPending(false);
-          // Optional: Show error message to user
+          alert(`Error getting AI suggestions: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
       }
     }
