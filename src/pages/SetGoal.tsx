@@ -179,7 +179,7 @@ const SetGoal: React.FC = () => {
           // Use Netlify function if not on localhost, otherwise use localhost
           const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
           const apiUrl = isLocalhost 
-            ? 'http://localhost:5000/api/suggest-category'
+            ? 'http://localhost:5000/api/recommend-categories'
             : '/.netlify/functions/suggest-category';
               const res = await fetch(apiUrl, {
                 method: 'POST',
