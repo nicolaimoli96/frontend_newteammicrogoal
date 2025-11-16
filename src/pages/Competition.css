@@ -17,22 +17,25 @@
 
 .competition-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   width: 100%;
   margin-bottom: 1rem;
+  position: relative;
 }
 
 .competition-title {
   font-size: 2rem;
   font-weight: 800;
   letter-spacing: 1px;
-  background: linear-gradient(90deg, #ffd700 30%, #ff8c00 70%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-fill-color: transparent;
+  color: #fff;
   margin: 0;
+  text-align: center;
+}
+
+.competition-header .end-competition-btn {
+  position: absolute;
+  right: 0;
 }
 
 .end-competition-btn {

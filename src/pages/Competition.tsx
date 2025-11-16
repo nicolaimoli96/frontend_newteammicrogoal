@@ -88,7 +88,7 @@ const Competition: React.FC = () => {
   return (
     <div className="competition-container">
       <div className="competition-header">
-        <h1 className="competition-title">🏆 Competition Management</h1>
+        <h1 className="competition-title">Competition Management</h1>
         {competition?.isActive && (
           <button onClick={handleEndCompetition} className="end-competition-btn">
             End Competition
@@ -246,7 +246,7 @@ const Competition: React.FC = () => {
               </div>
               <div className="input-group-compact">
                 <textarea
-                  placeholder="Motivational message..."
+                  placeholder="Competitions instructions"
                   value={instructions}
                   onChange={e => setInstructions(e.target.value)}
                   rows={2}
