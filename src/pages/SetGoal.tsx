@@ -258,7 +258,6 @@ const SetGoal: React.FC = () => {
   return (
     <div className="set-goal-container">
       <form onSubmit={handleSaveGoals}>
-        <h1>Daily Goals</h1>
         <div className="goals-section">
           <div className="goal-section">
             <h2>Sales Target</h2>
