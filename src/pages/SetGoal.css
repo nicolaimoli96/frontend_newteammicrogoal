@@ -331,7 +331,7 @@
 }
 
 .ai-modal button {
-  background: linear-gradient(90deg, #ff1493 60%, #00ff88 100%);
+  background: #ff1493;
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -339,14 +339,14 @@
   font-size: 0.9rem;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4);
+  box-shadow: 0 4px 20px rgba(255, 20, 147, 0.4);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   margin-top: 0.6rem;
 }
 
 .ai-modal button:hover {
-  background: linear-gradient(90deg, #00ff88 0%, #ff1493 100%);
-  box-shadow: 0 8px 30px rgba(255, 215, 0, 0.6);
+  background: #ff1493;
+  box-shadow: 0 8px 30px rgba(255, 20, 147, 0.6);
   transform: translateY(-2px) scale(1.02);
 }
 
