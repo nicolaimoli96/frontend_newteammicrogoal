@@ -87,6 +87,10 @@
 
 .ai-button-section {
   margin-top: 1rem;
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  width: 100%;
 }
 .goal-section {
   display: flex;
