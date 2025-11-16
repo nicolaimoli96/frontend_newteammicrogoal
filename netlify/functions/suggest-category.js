@@ -202,6 +202,12 @@ exports.handler = async (event, context) => {
     }
 
     // Return the response with CORS headers (Safari requires explicit headers)
+    // Ensure suggestions is always an array for Safari compatibility
+    const finalData = transformedData;
+    if (finalData.suggestions && !Array.isArray(finalData.suggestions)) {
+      finalData.suggestions = [];
+    }
+    
     return {
       statusCode: 200,
       headers: {
@@ -209,9 +215,10 @@ exports.handler = async (event, context) => {
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         'Access-Control-Allow-Methods': 'POST, OPTIONS, GET',
         'Content-Type': 'application/json',
-        'Vary': 'Origin'
+        'Vary': 'Origin',
+        'Cache-Control': 'no-cache'
       },
-      body: JSON.stringify(transformedData)
+      body: JSON.stringify(finalData)
     };
   } catch (error) {
     console.error('Function error:', error);

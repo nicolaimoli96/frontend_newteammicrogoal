@@ -207,8 +207,13 @@ const SetGoal: React.FC = () => {
           }
           const data = await res.json();
           setAiPending(false);
-          setAiModal(data.suggestions);  // Array of top 3 {category, quantity}
-          setSelectedSuggestion(0);  // Default to first suggestion
+          // Safari compatibility: ensure suggestions is an array
+          if (data && data.suggestions && Array.isArray(data.suggestions) && data.suggestions.length > 0) {
+            setAiModal(data.suggestions);  // Array of top 3 {category, quantity}
+            setSelectedSuggestion(0);  // Default to first suggestion
+          } else {
+            throw new Error('No suggestions received from AI');
+          }
         } catch (error) {
           console.error('Error fetching AI suggestion:', error);
           setAiPending(false);
