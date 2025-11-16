@@ -154,7 +154,9 @@
   cursor: pointer;
   box-shadow: 0 4px 20px rgba(255, 20, 147, 0.3);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  width: 100%;
+  width: auto;
+  margin: 0 auto;
+  display: block;
 }
 .save-button:hover {
   background: #ff1493;
