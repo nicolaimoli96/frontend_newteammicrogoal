@@ -14,7 +14,7 @@ const Sidebar: React.FC = () => {
           Daily Goals
         </NavLink>
         <NavLink to="/competition" className={({ isActive }) => isActive ? 'active' : ''}>
-          Competition Management
+          Company competition
         </NavLink>
       </nav>
     </div>
