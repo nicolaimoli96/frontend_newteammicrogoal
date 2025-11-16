@@ -257,7 +257,7 @@ const SetGoal: React.FC = () => {
 
   return (
     <div className="set-goal-container">
-      <h1>Set Your Daily Goals</h1>
+      <h1>Daily Goals</h1>
       <form onSubmit={handleSaveGoals}>
         <div className="goals-section">
           <div className="goal-section">
