@@ -104,11 +104,18 @@ const Competition: React.FC = () => {
           </div>
           <div className="summary-item">
             <span className="summary-label">Target:</span>
-            <span className="summary-value">{competition.quantity}</span>
+            <span className="summary-value">
+              {competition.item === 'ASPH' ? `£${competition.quantity}` : competition.quantity}
+            </span>
           </div>
           <div className="summary-item">
             <span className="summary-label">Progress:</span>
-            <span className="summary-value">{competition.actual} / {competition.quantity}</span>
+            <span className="summary-value">
+              {competition.item === 'ASPH' 
+                ? `£${competition.actual} / £${competition.quantity}`
+                : `${competition.actual} / ${competition.quantity}`
+              }
+            </span>
           </div>
         </div>
       )}
@@ -174,15 +181,39 @@ const Competition: React.FC = () => {
                 <h3>Target</h3>
               </div>
               <div className="input-group-compact">
-                <input
-                  type="number"
-                  min="1"
-                  step="1"
-                  placeholder="Quantity"
-                  value={quantity}
-                  onChange={e => setQuantity(e.target.value)}
-                  required
-                />
+                {item === 'ASPH' ? (
+                  <div style={{ position: 'relative' }}>
+                    <span style={{ 
+                      position: 'absolute', 
+                      left: '12px', 
+                      top: '50%', 
+                      transform: 'translateY(-50%)', 
+                      color: '#666',
+                      fontSize: '14px',
+                      pointerEvents: 'none'
+                    }}>£</span>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      placeholder="Enter target ASPH in £"
+                      value={quantity}
+                      onChange={e => setQuantity(e.target.value)}
+                      required
+                      style={{ paddingLeft: '28px' }}
+                    />
+                  </div>
+                ) : (
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    placeholder="Quantity"
+                    value={quantity}
+                    onChange={e => setQuantity(e.target.value)}
+                    required
+                  />
+                )}
               </div>
             </div>
 
