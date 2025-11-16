@@ -18,12 +18,14 @@
 }
 
 .set-goal-container form h1 {
+  grid-column: 1 / -1;
   margin-bottom: 1.5rem;
   font-size: 2.5rem;
   font-weight: 800;
   letter-spacing: 1px;
   color: #fff;
   text-align: center;
+  display: block;
 }
 .set-goal-container p {
   font-size: 1.15rem;
