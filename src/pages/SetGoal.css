@@ -54,11 +54,6 @@
   transition: box-shadow 0.3s, border 0.3s;
 }
 
-.set-goal-container form h1 {
-  grid-column: 1 / -1;
-  margin-bottom: 0;
-  text-align: center;
-}
 .set-goal-container form:hover {
   box-shadow: 0 12px 40px 0 rgba(255, 255, 255, 0.1);
   border: 1.5px solid rgba(255, 255, 255, 0.2);
