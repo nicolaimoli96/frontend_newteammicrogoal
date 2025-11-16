@@ -19,13 +19,16 @@
 
 .set-goal-container form h1 {
   grid-column: 1 / -1;
+  grid-row: 1;
   margin-bottom: 1.5rem;
+  margin-top: 0;
   font-size: 2.5rem;
   font-weight: 800;
   letter-spacing: 1px;
   color: #fff;
   text-align: center;
   display: block;
+  order: -1;
 }
 .set-goal-container p {
   font-size: 1.15rem;
@@ -52,6 +55,7 @@
   margin-right: auto;
   margin-bottom: 2rem;
   transition: box-shadow 0.3s, border 0.3s;
+  grid-auto-flow: row;
 }
 
 .set-goal-container form:hover {
