@@ -16,6 +16,15 @@
   color: #fff;
   text-align: center;
 }
+
+.set-goal-container form h1 {
+  margin-bottom: 1.5rem;
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #fff;
+  text-align: center;
+}
 .set-goal-container p {
   font-size: 1.15rem;
   color: #b0b8c1;
@@ -25,7 +34,7 @@
 .set-goal-container form {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr;
+  grid-template-rows: auto 1fr;
   gap: 2rem;
   background: rgba(35, 39, 47, 0.7);
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
@@ -35,12 +44,18 @@
   border: 1.5px solid rgba(255,255,255,0.08);
   padding: 2rem;
   width: 100%;
-  max-width: 1200px;
+  max-width: 1400px;
   box-sizing: border-box;
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 2rem;
   transition: box-shadow 0.3s, border 0.3s;
+}
+
+.set-goal-container form h1 {
+  grid-column: 1 / -1;
+  margin-bottom: 0;
+  text-align: center;
 }
 .set-goal-container form:hover {
   box-shadow: 0 12px 40px 0 rgba(255, 255, 255, 0.1);
