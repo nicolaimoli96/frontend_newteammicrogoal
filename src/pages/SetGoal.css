@@ -39,7 +39,7 @@
 .set-goal-container form {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr;
+  grid-template-rows: 1fr auto;
   gap: 2rem;
   background: #23272f;
   border-radius: 18px;
@@ -157,6 +157,8 @@
   width: auto;
   margin: 0 auto;
   display: block;
+  grid-column: 1 / -1;
+  justify-self: center;
 }
 .save-button:hover {
   background: #ff1493;
