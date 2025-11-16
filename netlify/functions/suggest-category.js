@@ -11,14 +11,16 @@ exports.handler = async (event, context) => {
       body: JSON.stringify({ error: 'Fetch API not available in this environment' })
     };
   }
-  // Handle CORS preflight requests
+  // Handle CORS preflight requests (Safari is stricter about CORS)
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS, GET',
+        'Access-Control-Max-Age': '86400',
+        'Content-Length': '0'
       },
       body: ''
     };
@@ -142,9 +144,10 @@ exports.handler = async (event, context) => {
         statusCode: response.status,
         headers: {
           'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Headers': 'Content-Type',
-          'Access-Control-Allow-Methods': 'POST, OPTIONS',
-          'Content-Type': 'application/json'
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+          'Access-Control-Allow-Methods': 'POST, OPTIONS, GET',
+          'Content-Type': 'application/json',
+          'Vary': 'Origin'
         },
         body: JSON.stringify({ 
           error: `Backend error (${response.status}): ${errorData.error || response.statusText}`,
@@ -198,14 +201,15 @@ exports.handler = async (event, context) => {
       transformedData = data;
     }
 
-    // Return the response with CORS headers
+    // Return the response with CORS headers (Safari requires explicit headers)
     return {
       statusCode: 200,
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Content-Type': 'application/json'
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS, GET',
+        'Content-Type': 'application/json',
+        'Vary': 'Origin'
       },
       body: JSON.stringify(transformedData)
     };

@@ -181,15 +181,20 @@ const SetGoal: React.FC = () => {
           const apiUrl = isLocalhost 
             ? 'http://localhost:5000/api/suggest-category'
             : '/.netlify/functions/suggest-category';
-          const res = await fetch(apiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              day_of_week: microDay,
-              hour: microHour,
-              weather: microWeather
-            })
-          });
+              const res = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 
+                  'Content-Type': 'application/json',
+                  'Accept': 'application/json'
+                },
+                mode: 'cors',
+                credentials: 'omit',
+                body: JSON.stringify({
+                  day_of_week: microDay,
+                  hour: microHour,
+                  weather: microWeather
+                })
+              });
           if (!res.ok) {
             const errorText = await res.text();
             let errorData;
