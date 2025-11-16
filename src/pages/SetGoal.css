@@ -86,11 +86,12 @@
 }
 
 .ai-button-section {
-  margin-top: 1rem;
   grid-column: 1 / -1;
+  grid-row: 2;
   display: flex;
   justify-content: center;
   width: 100%;
+  margin-top: 2rem;
 }
 .goal-section {
   display: flex;

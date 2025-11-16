@@ -441,12 +441,6 @@ const SetGoal: React.FC = () => {
             </>
           )}
           </div>
-          
-          <div className="ai-button-section">
-            <button onClick={handleSaveGoals} className="save-button" disabled={aiPending}>
-              {aiPending ? 'AI is thinking...' : microGoalMode === 'manual' ? 'Save Goals' : 'Get AI Suggestions'}
-            </button>
-          </div>
         </div>
         
         <div className="competing-locations-section">
@@ -478,6 +472,12 @@ const SetGoal: React.FC = () => {
               </button>
             </div>
           </div>
+        </div>
+        
+        <div className="ai-button-section">
+          <button onClick={handleSaveGoals} className="save-button" disabled={aiPending}>
+            {aiPending ? 'AI is thinking...' : microGoalMode === 'manual' ? 'Save Goals' : 'Get AI Suggestions'}
+          </button>
         </div>
       </form>
       <div className="save-feedback" style={{ display: 'none' }}>Goals saved!</div>
