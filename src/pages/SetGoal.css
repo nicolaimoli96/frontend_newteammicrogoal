@@ -52,7 +52,6 @@
   margin-right: auto;
   margin-bottom: 2rem;
   transition: border 0.3s;
-  grid-auto-flow: row;
 }
 
 .set-goal-container form:hover {
@@ -90,6 +89,7 @@
   grid-row: 2;
   display: flex;
   justify-content: center;
+  align-items: center;
   width: 100%;
   margin-top: 2rem;
 }
@@ -160,10 +160,8 @@
   box-shadow: 0 4px 20px rgba(255, 20, 147, 0.3);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   width: auto;
-  margin: 0 auto;
+  margin: 0;
   display: block;
-  grid-column: 1 / -1;
-  justify-self: center;
 }
 .save-button:hover {
   background: #ff1493;
